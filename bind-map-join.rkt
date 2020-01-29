@@ -28,3 +28,6 @@
     [(cons $1 $$3) ($append $1 ($join $$3))]))
 
 ;; whereas for bind an f looks like a -> M b
+
+;; Notice, though that this implementation depends on the $append
+;; function.
