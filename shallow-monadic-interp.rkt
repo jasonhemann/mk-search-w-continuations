@@ -47,7 +47,6 @@
 (define (mplus $1 $2)
   ($append $1 $2))
 
-
 ;; We also do not have a `run` for the monad's implementation.
 
 ;; If we in fact do have a monad here, it should be the composition of
