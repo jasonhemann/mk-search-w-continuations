@@ -67,6 +67,4 @@ Wand and Vallaincourt extended and revised Danvy et al, and their
 revisiting and extending makes it a bit easier still to follow some of
 the machinations in Danvy et al.
 
-
-
-
+We anticipate semantics directed compilation by partial evaluation. 
