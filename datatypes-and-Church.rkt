@@ -106,3 +106,9 @@
 ;; for an η reduction.
 
 ;; We'll do the next obvious thing for the sk/fk semantics and the 
+
+;; We introduce a type for the Stream monad, and then compare that to
+;; the sk/fk semantics.
+
+;; (int -> (1 -> α) -> α) -> (1 -> α) -> α
+
