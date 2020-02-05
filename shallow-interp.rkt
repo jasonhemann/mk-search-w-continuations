@@ -30,7 +30,7 @@
   (match g
     [`(succeed) (list s)]
     [`(fail) (list)]
-    [`(^ ,g1 ,g2) ($append-map (eval g1 s) ?????)] ;; (λ (s) (eval g2 s)) or g2
+    [`(^ ,g1 ,g2) ($append-map (eval g1 s) (λ (s) (eval g2 s)))] ;; (λ (s) (eval g2 s)) or g2
     [`(v ,g1 ,g2) ($append (eval g1 s) (eval g2 s))]
     [`(threeo) (λ () (eval '(twoo) s))]
     [`(twoo)   (λ () (eval '(one) s))]
@@ -47,7 +47,7 @@
   (cond
     [(null? $1) '()]
     [(procedure? $1) (λ () ($append-map $1 f))] 
-    [(pair? $1) ($append (?? (car $1) ???) ($append-map (cdr $1) f))])) ;; (f (car $1)) or (eval (car $1) f)
+    [(pair? $1) ($append (f (car $1)) ($append-map (cdr $1) f))])) ;; (f (car $1)) or (eval (car $1) f)
 
 ;; [`(^ ,g1 ,g2) ($append-map (eval g1 s) ?????)]
 
@@ -59,3 +59,13 @@
 ;; along. It's unclear which is right. It goes along with this line:
 
 ;; [(pair? $1) ($append (?? (car $1) ???) ($append-map (cdr $1) f))]
+
+;; I want to right now convince myself that (λ (s) (eval g2 s)) is the
+;; right choice. It _has_ to be right, because it's a function from a
+;; raw value to something "in the monad."
+
+;; In principle oughtn't I be able to do this same thing without an
+;; underlying environment monad? If that is what I
+;; have---environment/reader?
+
+;; https://hackage.haskell.org/package/hexpr-0.0.0.0/docs/Control-Monad-Environment.html
