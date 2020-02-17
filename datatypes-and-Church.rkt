@@ -112,3 +112,52 @@
 
 ;; (int -> (1 -> α) -> α) -> (1 -> α) -> α
 
+;; An interesting question: ought there be another way to implement
+;; the mK search, the way that there is with the Danvy Icon monad model?
+
+;; Would that be the 4-tuple version: empty, one, one+k, one+more from
+;; the original TRS? If so, of what datatype is that an encoded Hughes
+;; version?
+
+;; Does one get to the sk/fk monad via double-CPSing?
+
+;; Danvy says that the sk/fk monad is linked to the stream monad by a
+;; Church encoding of the datatype of Streams:
+
+;; Danvy uses the following datatype for streams. 
+;; Stream α = End | More α (Unit -> (Stream α))
+
+;; This seems like the "Odd Style" w/Ease under Wadler et al's
+;; terminology.  Notice the odd number of constructors.
+
+;; lazy Stream' α = Nil | Cons α (Stream' α)
+;; The 'lazy' out front of the definition means that each constructor effectively returns a thunk.
+
+;; I can't understand Danvy's Stream datatype here. He seems to
+;; explicitly include the 1 -> Stream α, the thunk used to Delay
+;; computation, in the end. If we put it explicitly there in the 
+
+;; Well, maybe it's *not* clear that Danvy is using the Odd style. I
+;; think he's using Even. From the Church encoding he gives, we use
+;; End(); which looks like invoking a thunk. If he's got to invoke a
+;; thunk to get the right answer from End, then seems like the
+;; constructor creates a thunk. And only with the Even style is End
+;; guaranteed to be a thunk that needs invoking.
+
+;; So, from this discussion we conclude that in fact Danvy is using
+;; the Wadler Even streams. 
+
+;; What does that mean for us? Is there a difference for Church
+;; encoded datatypes b/t Even and Odd streams? It will be interesting
+;; to see what corresponds to streams in Wadler's Odd style.
+
+;; We can compare re: the DT of Wadler streams, and ours. It seems
+;; like ours are _exactly_ a fusion of the even/odd types under
+;; Wadler. And we get their either by fusing the extended DTs of his
+;; even style w/difficulty or odd style w/difficulty. So take either
+;; approach. Ours is here a fusion of the Even and Odd styles of
+;; streams under Wadler. Best of both worlds.
+
+;; Get into the office early, and explain the problem to Aaron Weiss.
+
+
