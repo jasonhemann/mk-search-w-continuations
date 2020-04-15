@@ -1,0 +1,34 @@
+| pc     | g        | $      | $2 | k               | i    | pc     | g                   | $                | $2  | k          | i    |
+|--------+----------+--------+----+-----------------+------+--------+---------------------+------------------+-----+------------+------|
+| appk   | g        | $      | $2 | empty-k         | i    |        |                     |                  |     |            |      |
+| appk   | g        | $      | $2 | d-k2 $2' k'     | i    | app    | g                   | $                | $2' | k'         | i    |
+| appk   | g        | $      | $2 | d-k1 g' k'      | i    | ee     | g'                  | $                | $2  | d-k2 $ k'  | i    |
+| appk   | g        | $      | $2 | c-k g' k'       | i    | appmap | g'                  | $                | $2  | k'         | i    |
+| appk   | g        | $      | $2 | app-lk $2' k'   | i    | app    | g                   | $2'              | $   | k'         | i    |
+| appk   | g        | $      | $2 | app-ck a' k'    | i    | appk   | g                   | m a' $           | $2  | k'         | i    |
+| appk   | g        | $      | $2 | appmap-th g' k' | i    | appk   | g                   | c-k g' $         | $2  | k'         | i    |
+| appk   | g        | $      | $2 | app-th $2' k'   | i    | appk   | g                   | app-lk $2' $     | $2  | k'         | i    |
+| appk   | g        | $      | $2 | take-lk k'      | i    | take   | g                   | $                | $2  | k'         | i'   |
+| appk   | g        | $      | $2 | append-th       | i    | ee     | d (c s s) (c s app) | $                | $2  | $          | i    |
+| appk   | g        | $      | $2 | never-th        | i    | ee     | never               | $                | $2  | $          | i    |
+| appk   | g        | $      | $2 | all-th          | i    | ee     | d s all             | $                | $2  | $          | i    |
+| ee     | d g' g'' | $      | $2 | k               | i    | ee     | g''                 | $                | $2  | d-k1 g' k  | i    |
+| ee     | c g' g'' | $      | $2 | k               | i    | ee     | g'                  | $                | $2  | c-k g'' k  | i    |
+| ee     | s        | $      | $2 | k               | i    | appk   | g                   | m 't e           | $2  | k          | i    |
+| ee     | f        | $      | $2 | k               | i    | appk   | g                   | e                | $2  | k          | i    |
+| ee     | append   | $      | $2 | k               | i    | appk   | g                   | l append-th      | $2  | k          | i    |
+| ee     | never    | $      | $2 | k               | i    | appk   | g                   | l never-th       | $2  | k          | i    |
+| ee     | all      | $      | $2 | k               | i    | appk   | g                   | l all-th         | $2  | k          | i    |
+| appmap | g        | e      | $2 | k               | i    | appk   | g                   | e                | $2  | k          | i    |
+| appmap | g        | m a $' | $2 | k               | i    | appmap | g                   | $'               | $2  | d-k1 g k   | i    |
+| appmap | g        | l k'   | $2 | k               | i    | appk   | g                   | l appmap-th g k' | $2  | k          | i    |
+| app    | g        | e      | $2 | k               | i    | appk   | g                   | $2               | $2  | k          | i    |
+| app    | g        | m a $' | $2 | k               | i    | app    | g                   | $'               | $2  | app-ck a k | i    |
+| app    | g        | l k'   | $2 | k               | i    | appk   | g                   | app-th $2 k'     | $2  | k          | i    |
+| take   | g        | $      | $2 | k               | 0    | appk   | g                   | $                | $2  | k          | 0    |
+| take   | g        | e      | $2 | k               | 1 i' | appk   | g                   | e                | $2  | k          | 1 i' |
+| take   | g        | m a $' | $2 | k               | 1 i' | take   | g                   | $'               | $2  | app-ck a k | i'   |
+| take   | g        | l k'   | $2 | k               | 1 i' | appk   | g                   | take-lk k        | $2  | k'         | 1 i' |
+
+
+

@@ -1,0 +1,140 @@
+3k microKanren Internals Research
+
+This research began in the shadow of some earlier but failed work at
+attempting to implement a microKanren in Idris. I'd wanted to prove a
+whole bunch of the properties needed for showing termination of the
+search at every step, and also to show that our interleaving search
+was fair in some important sense. I had suspected that using the
+continuation based model would make it easier to demonstrate these
+properties.
+
+I was also thinking about register machines and small step Kanren
+semantics. I'd started implementing a basic interpreter for a
+simplified stream-based microKanren version in the
+`micro-control-interp.rkt` file. This file (along with the -cps
+versions) was in the service of transforming the interpreter into a
+register machine. Which we ultimately did. We can see this in the
+./mk-interp/ directory. We can see that as the `trans.pdf` machine
+with transition diagrams.
+
+This resulted in a "not especially pretty" looking state machine.
+This wasn't especially satisfying, and it was a shame that it didn't
+come out nicer. I'd imagined that my "horse sense" didn't take me all
+the way down the best path when deriving this, because there were
+several places where we had choices to make. Dan and I had discussed
+that of course there should be a multi-continuation model of
+backtracking that we just hadn't implemented. So, I wanted to do so. I
+thought the state machine resulting from the continuation versions
+might be nicer, and point the way to the state machine I *wanted* to
+derive from the stream version of the interpreter. Like, figure out
+the *right* target, and then back into it from the beginning.
+
+It was at this point that we started to contemplate how different and
+additionally complex our particular datatype was in the file
+`test-new-mk-interp.rkt`. The fancier mK stream datatype that has so
+much more structure to it than do the streams from the Danvy "Unified
+Approach" paper. Even finding out what the monadic structure of the
+interleaving backtracking monad that underlies our mK search should
+_look_ like would be a tricky endeavor. The unit/bind version of the
+monad was going to be complex, and so much of the work just sits there
+in the bind model.
+
+We decided to try and also build a `map` and a `join` version of said
+monad. We hoped to see if trying each helped construct the other. We
+knew the laws that monads have to obey, and we know how the different
+monad definitions have to relate to each other. Dave Herman's
+translations show how to literally, syntactically translate between
+bind and map/join definitions. This was in fits and starts. We started
+in `mk-monad-map-join.rkt` trying to figure out the equivalences
+between the two models based on what we _did_ understand. Since ours
+were to be _more_ expressive than either Even or Odd streams, they
+should be able to at _least_ have the functionality of Even and Odd
+streams, and that we could sanity check first, get most of the
+structure right, and then hopefully fill in the rest with what _has_
+to go there, based on the structure that we already knew, get as far
+as we could from what we knew, and then plan to use "horse sense" from
+there. We tried first to express the streams model as a faked ADT in
+Racket, and work toward an interpreter for a basic Kanren.
+
+So we didn't really know how to think of the miniKanren monad as a
+monad in and of itself. We didn't have great denotations for the
+streams. We didn't have an analogous continuation-based implementation
+of this same monad. We didn't have a monadic semantics for a Kanren
+language based over this monad. We didn't have a run out of that
+monad. We didn't have a proof of the correspondence between the two
+implementations of that monad. These problems interrelate.
+
+The real difficulty of this whole enterprise comes from the additional
+complexity of our delay operation, and the recursion that comes with
+the implementations of these operations (see
+`map-join-with-dan-3.rkt`, etc. for these recursive implentations.)
+
+I tried leaning on my experience from figuring out how to encode an
+interpreter in Idris (numbering the relations in some global initial
+environment). This was a mistake. The better interpreter starting
+point was to ignore the global environment and added a fixed, finite
+set of recursive relations in the interpreted language---a crutch for
+the time being. We were able to translate over with the understanding
+and expectation that the continuation versions had to behave like the
+stream versions, according to those laws.
+
+The file `three-k-test.rkt` seems to be where we really began to come
+into our own. It looked to us like, if the sk has to take the dk and
+the fk, and the dk has to take the fk, then our original system is one
+that can delay or fail, and that we added the success on to that.
+
+We also realized that we didn't need to look as far as a Kanren for
+using these continuation analogues of our stream implementations. Even
+some of Danvy's programs for producing streams were sufficient to put
+the continuation versions through their paces. 
+
+Bind was tricky to figure out, and so we thought once again, let's try
+from the simpler map-join implementations. We knew the additional
+complexity was the delay. The 2k version was like the lazy list
+version. 
+
+We needed some `run` out of our monad: a way to come back out with one
+or multiple values. And I wondered what _our_ should initial
+continuations look like. The connection is by analogy with being able
+to pass the list-building operations in for the sk and fk and getting
+the lists back out. Danvy or Wand papers showed seeding with some
+initial continuations. Another analog is passing `add1` and `0` into
+Church numerals. We should be able to do something like that. The
+two-k model computations have type (α -> (𝕀 -> β)) -> (𝕀 -> β) -> β.
+First the success K, then the failure K, and then produces a
+value. The operations to produce eager lists are (\a \b. cons a (b))
+and (lambda () '()), and I believe the operations to produce lazy
+lists are (\a \b. cons a b) and (lambda () '()).
+
+In trying to work the delays in, we started first with the sk/fk
+version and then took the dk in as a dummy argument. We required that
+third continuation argument but didn't *do* anything with it, and made
+sure that we maintained the original version's behavior still working
+right. We needed to be able to succeed and to fail, and we needed to
+be able to have the Monad, MonadPlus behavior. We'd then have to see
+about squeezing in the additional superpowers from Delay.
+
+Disj was more complicated, so we put that off for a time.
+
+Some of the technical questions surfaced in `map-join-with-dan-3.rkt`
+and `map-join-with-dan-4.rkt`. These questions include whether the sk
+should take the dk, and what the delay part of running out of the
+monad should look like. Running out of this operation remains some of
+the most interesting outstanding behavior. These `map-join-with-dan`
+files proceed with mainly small changes; from about number 4 on it's
+basically in the shape that we got it.
+
+I thought this was a reasonable way or place to start approaching the
+register machine again. At least as far as I understood the approach,
+that required CPSing the program again---turning the 311 crank. We
+could approach the register machine model itself, but the control flow
+through the run (`looper`) was confusing, and I still am unsure how
+well that plays in.
+
+Because this control flow through `looper` was so confusing, I wanted
+to try and derive my way in the `a9-skmonads2/micro-ks-X` files to the
+three continuation model via CPSing the two-k version somehow into the
+3 k version that I want. I wasn't exactly sure how to do it and how to
+get there, and that's about where I got stopped.
+
+

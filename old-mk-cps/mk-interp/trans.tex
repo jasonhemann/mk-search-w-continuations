@@ -1,0 +1,64 @@
+% Created 2017-06-15 Thu 21:07
+% Intended LaTeX compiler: pdflatex
+\documentclass[12pt]{article} %% ,landscape
+\usepackage[T1]{fontenc}
+\usepackage[legalpaper,landscape]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+%% \author{Jason Hemann}
+%% \date{\today}
+%% \title{}
+%% \hypersetup{
+%%  pdfauthor={Jason Hemann},
+%%  pdftitle={},
+%%  pdfkeywords={},
+%%  pdfsubject={},
+%%  pdfcreator={Emacs 25.2.1 (Org mode 9.0.7)}, 
+%%  pdflang={English}}
+\begin{document}
+\begin{center}
+\begin{tabular}{llllllcllllll}
+<pc, & g, & \$, & \$2, & k, & i> & to & <pc, & g, & \$, & \$2, & k, & i> \\
+\hline
+<appk, & g, & \$, & \$2, & empty-k, & i> &  & <, &, &, &, &, &> \\
+<appk, & g, & \$, & \$2, & d-k2 \$3 k1, & i> & & <app, & g, & \$, & \$3, & k1, & i>\\
+<appk, & g, & \$, & \$2, & d-k1 g1 k1, & i> & & <ee, & g1, & \$, & \$2, & d-k2 \$ k1, & i>\\
+<appk, & g, & \$, & \$2, & c-k g1 k1, & i> & & <appmap, & g1, & \$, & \$2, & k1, & i>\\
+<appk, & g, & \$, & \$2, & app-lk \$3 k1, & i> & & <app, & g, & \$3, & \$, & k1, & i>\\
+<appk, & g, & \$, & \$2, & app-ck a1 k1, & i> & & <appk, & g, & m a1 \$, & \$2, & k1, & i>\\
+<appk, & g, & \$, & \$2, & appmap-th g1 k1, & i> & & <appk, & g, & c-k g1 \$, & \$2, & k1, & i>\\
+<appk, & g, & \$, & \$2, & app-th \$3 k1, & i> & & <appk, & g, & app-lk \$3 \$, & \$2, & k1, & i>\\
+<appk, & g, & \$, & \$2, & take-lk k1, & i> & & <take, & g, & \$, & \$2, & k1, & i>\\
+<appk, & g, & \$, & \$2, & append-th, & i> & & <ee, & d (c s s) (c s app), & \$, & \$2, & \$, & i>\\
+<appk, & g, & \$, & \$2, & never-th, & i> & & <ee, & never, & \$, & \$2, & \$, & i>\\
+<appk, & g, & \$, & \$2, & all-th, & i> & & <ee, & d s all, & \$, & \$2, & \$, & i>\\
+<ee, & d g1 g2, & \$, & \$2, & k, & i> & & <ee, & g2, & \$, & \$2, & d-k1 g1 k, & i>\\
+<ee, & c g1 g2, & \$, & \$2, & k, & i> & & <ee, & g1, & \$, & \$2, & c-k g2 k, & i>\\
+<ee, & s, & \$, & \$2, & k, & i> & & <appk, & g, & m \#t e, & \$2, & k, & i>\\
+<ee, & f, & \$, & \$2, & k, & i> & & <appk, & g, & e, & \$2, & k, & i>\\
+<ee, & append, & \$, & \$2, & k, & i> & & <appk, & g, & l append-th, & \$2, & k, & i>\\
+<ee, & never, & \$, & \$2, & k, & i> & & <appk, & g, & l never-th, & \$2, & k, & i>\\
+<ee, & all, & \$, & \$2, & k, & i> & & <appk, & g, & l all-th, & \$2, & k, & i>\\
+<appmap, & g, & e, & \$2, & k, & i> & & <appk, & g, & e, & \$2, & k, & i>\\
+<appmap, & g, & m a \$1, & \$2, & k, & i> & & <appmap, & g, & \$1, & \$2, & d-k1 g k, & i>\\
+<appmap, & g, & l k1, & \$2, & k, & i> & & <appk, & g, & l appmap-th g k1, & \$2, & k, & i>\\
+<app, & g, & e, & \$2, & k, & i> & & <appk, & g, & \$2, & \$2, & k, & i>\\
+<app, & g, & m a \$1, & \$2, & k, & i> & & <app, & g, & \$1, & \$2, & app-ck a k, & i>\\
+<app, & g, & l k1, & \$2, & k, & i> & & <appk, & g, & app-th \$2 k1, & \$2, & k, & i>\\
+<take, & g, & \$, & \$2, & k, & 0> & & <appk, & g, & \$, & \$2, & k, & 0>\\
+<take, & g, & e, & \$2, & k, & s n> & & <appk, & g, & e, & \$2, & k, & s n>\\
+<take, & g, & m a \$1, & \$2, & k, & s n> & & <take, & g, & \$1, & \$2, & app-ck a k, & n>\\
+<take, & g, & l k1, & \$2, & k, & s n> & & <appk, & g, & take-lk k, & \$2, & k1, & s n>\\
+\end{tabular}
+\end{center}
+\end{document}

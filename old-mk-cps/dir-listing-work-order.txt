@@ -1,0 +1,99 @@
+Order of the prior work that we've done. As best we know how to
+sequence it.  This is the best partial reconstruction, and hopefully
+some ordering as to how to approach re-engaging in this material.
+
+
+drwxr-xr-x   13 jhemann  staff       442 Apr  6 19:33 a9-skmonads2
+./a9-skmonads2:
+drwxr-xr-x   13 jhemann  staff    442 Apr  6 19:33 .
+drwxr-xr-x  355 jhemann  staff  12070 Apr  6 19:21 ..
+-rw-r--r--    1 jhemann  staff   8641 Oct  1  2017 micro-ks-2.rkt
+-rw-r--r--    1 jhemann  staff   1947 Jul  7  2017 micro-ks-3.rkt
+-rw-r--r--    1 jhemann  staff   2327 Jul  7  2017 micro-ks-5.rkt
+-rw-r--r--    1 jhemann  staff   2327 Jul  6  2017 micro-ks-5.rkt~
+-rw-r--r--    1 jhemann  staff   2136 Jul  6  2017 micro-ks-4.rkt
+-rw-r--r--    1 jhemann  staff   1034 Jul  3  2017 micro-ks.rkt
+
+drwxr-xr-x   18 jhemann  staff       612 Nov 12  2018 a9-skmonads
+./a9-skmonads:
+drwxr-xr-x  355 jhemann  staff  12070 Apr  6 19:21 ..
+drwxr-xr-x   18 jhemann  staff    612 Nov 12  2018 .
+-rw-r--r--    1 jhemann  staff   2198 Jul  3  2017 map-join-xform-other-monad.rkt
+-rw-r--r--    1 jhemann  staff   3966 Jul  3  2017 map-join-xform-other-monad-3.rkt
+-rw-r--r--    1 jhemann  staff   3168 Jul  3  2017 map-join-xform-other-monad-4c.rkt
+-rw-r--r--    1 jhemann  staff   3911 Jul  3  2017 map-join-xform-other-monad-4d.rkt
+-rw-r--r--    1 jhemann  staff   4474 Jul  3  2017 map-join-xform-other-monad-4.rkt
+-rw-r--r--    1 jhemann  staff   2955 Jun 30  2017 map-join-xform-other-monad-4b.rkt
+-rw-r--r--    1 jhemann  staff   2097 Jun 29  2017 map-join-xform-other-monad-2.rkt
+
+-rw-r--r--    1 jhemann  staff       360 Feb  1  2018 try-mk.rkt
+-rw-r--r--    1 jhemann  staff     20486 Jul  3  2017 map-join-with-dan-9.rkt
+-rw-r--r--    1 jhemann  staff      2184 Jun 29  2017 map-join-xform-other-monad.rkt
+-rw-r--r--    1 jhemann  staff      1870 Jun 28  2017 map-join-xform-2.rkt
+-rw-r--r--    1 jhemann  staff      1181 Jun 28  2017 map-join-xform.rkt
+-rw-r--r--    1 jhemann  staff     20522 Jun 28  2017 map-join-with-dan-9.rkt~
+-rw-r--r--    1 jhemann  staff      1521 Jun 28  2017 map-join-with-dan-dans-fixes.rkt
+-rw-r--r--    1 jhemann  staff     22190 Jun 27  2017 map-join-with-dan-8c.rkt
+-rw-r--r--    1 jhemann  staff     11862 Jun 27  2017 map-join-with-dan-7b.rkt
+-rw-r--r--    1 jhemann  staff     12458 Jun 27  2017 map-join-with-dan-8b.rkt
+-rw-r--r--    1 jhemann  staff     11419 Jun 27  2017 map-join-with-dan-7.rkt
+-rw-r--r--    1 jhemann  staff      9615 Jun 27  2017 map-join-with-dan-10.rkt
+-rw-r--r--    1 jhemann  staff     10624 Jun 27  2017 map-join-with-dan-8.rkt
+-rw-r--r--    1 jhemann  staff      9876 Jun 27  2017 map-join-with-dan-6.rkt
+-rw-r--r--    1 jhemann  staff      9871 Jun 27  2017 map-join-with-dan-5.rkt
+-rw-r--r--    1 jhemann  staff      9935 Jun 27  2017 map-join-with-dan-4.rkt
+-rw-r--r--    1 jhemann  staff      8265 Jun 27  2017 map-join-with-dan-3.rkt
+-rw-r--r--    1 jhemann  staff      5771 Jun 27  2017 map-join-with-dan-2.rkt
+-rw-r--r--    1 jhemann  staff      2026 Jun 27  2017 map-join-with-dan.rkt
+-rw-r--r--    1 jhemann  staff      2606 Jun 26  2017 map-join-3-k.rkt
+-rw-r--r--    1 jhemann  staff     18176 Jun 25  2017 three-k-test.rkt~
+-rw-r--r--    1 jhemann  staff      1485 Jun 24  2017 #three-k-test-2.rkt#
+-rw-r--r--    1 jhemann  staff       169 Jun 24  2017 dans-3-implementation.rkt
+-rw-r--r--    1 jhemann  staff       737 Jun 24  2017 two-k-test.rkt
+-rw-r--r--    1 jhemann  staff      1174 Jun 20  2017 micro-control-interp.rkt
+-rw-r--r--    1 jhemann  staff      2302 Jun 20  2017 monad-micro-interp.rkt
+-rw-r--r--    1 jhemann  staff      3931 Jun 15  2017 mk-monad-map-join.rkt
+-rw-r--r--    1 jhemann  staff      1304 Jun 13  2017 test-new-mk-interp.rkt
+
+./mk-interp:
+-rw-r--r--    1 jhemann  staff   1724 Jun 20  2017 mk-interp-1-2.rkt
+-rw-r--r--@   1 jhemann  staff  18119 Jun 15  2017 trans.pdf
+-rw-r--r--    1 jhemann  staff   3373 Jun 15  2017 trans.tex
+-rw-r--r--    1 jhemann  staff   4250 Jun 15  2017 trans.org
+-rw-r--r--    1 jhemann  staff   4250 Jun 15  2017 trans.rkt
+-rw-r--r--    1 jhemann  staff   7924 Jun 15  2017 mk-interp-8.rkt
+-rw-r--r--    1 jhemann  staff   3931 Jun 13  2017 mk-interp-6.rkt
+-rw-r--r--    1 jhemann  staff    358 Jun 12  2017 two-cont-model.rkt
+-rw-r--r--    1 jhemann  staff   1090 Jun  6  2017 mk-interp-1-2.rkt~
+-rw-r--r--    1 jhemann  staff   1090 Jun  6  2017 mk-interp-1-1.rkt
+-rw-r--r--    1 jhemann  staff   3416 Jun  3  2017 mk-interp-4-2.rkt~
+-rw-r--r--    1 jhemann  staff   3416 Jun  3  2017 mk-interp-3-2.rkt
+-rw-r--r--    1 jhemann  staff   6568 May 31  2017 mk-interp-7.rkt
+-rw-r--r--    1 jhemann  staff   1774 May 31  2017 mk-interp-1.rkt
+-rw-r--r--    1 jhemann  staff   4272 May 30  2017 mk-interp-5.rkt
+-rw-r--r--    1 jhemann  staff   3380 May 30  2017 mk-interp-4.rkt
+-rw-r--r--    1 jhemann  staff   3409 May 30  2017 mk-interp-3.rkt
+-rw-r--r--    1 jhemann  staff   2826 May 30  2017 mk-interp-2.rkt
+
+-rw-r--r--    1 jhemann  staff      7230 May 31  2017 dls-mk.rkt
+-rw-r--r--    1 jhemann  staff      2630 May 27  2017 micro-control-inter-cps-take-3-2.rkt
+-rw-r--r--    1 jhemann  staff      3753 May 27  2017 micro-control-interp-cps-take-2-8.rkt
+-rw-r--r--    1 jhemann  staff     26929 May 21  2017 comm-conj.rkt
+-rw-r--r--    1 jhemann  staff      5781 May 21  2017 micro-control-interp-cps-take-2-7.rkt
+-rw-r--r--    1 jhemann  staff      6097 May 21  2017 micro-control-interp-cps-take-2-6.rkt
+-rw-r--r--    1 jhemann  staff      4023 May 21  2017 micro-control-interp-cps-take-2-5.rkt
+-rw-r--r--    1 jhemann  staff      2767 May 21  2017 micro-control-interp-cps-take-2-4.rkt
+-rw-r--r--    1 jhemann  staff      2700 May 21  2017 micro-control-interp-cps-take-2-3.rkt
+-rw-r--r--    1 jhemann  staff      2758 May 21  2017 micro-control-interp-cps-take-2-2.rkt
+-rw-r--r--    1 jhemann  staff      1453 May 21  2017 inner-vs-outer.rkt
+-rw-r--r--    1 jhemann  staff      2028 May 21  2017 micro-control-interp-cps-1.rkt
+-rw-r--r--    1 jhemann  staff      2725 May 20  2017 micro-control-interp-cps-3.rkt
+-rw-r--r--    1 jhemann  staff      3237 May 20  2017 micro-control-interp-cps-2.rkt
+-rw-r--r--    1 jhemann  staff      1122 May 20  2017 micro-control-interp-cps.rkt
+-rw-r--r--@   1 jhemann  staff      6987 May  9  2017 system-mk.scm
+-rw-r--r--@   1 jhemann  staff      3603 May  2  2017 monads.rkt
+-rw-r--r--@   1 jhemann  staff      3603 May  1  2017 monads-file.rkt
+-rw-r--r--    1 jhemann  staff        75 Jan 30  2017 test-monads.rkt
+-rw-r--r--    1 jhemann  staff     23916 Jan 24  2017 mk.rkt
+
+
