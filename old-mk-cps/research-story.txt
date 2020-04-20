@@ -67,7 +67,7 @@ implementations of that monad. These problems interrelate.
 The real difficulty of this whole enterprise comes from the additional
 complexity of our delay operation, and the recursion that comes with
 the implementations of these operations (see
-`map-join-with-dan-3.rkt`, etc. for these recursive implentations.)
+`map-join-with-dan-3.rkt`, etc. for these recursive implementations.)
 
 I tried leaning on my experience from figuring out how to encode an
 interpreter in Idris (numbering the relations in some global initial
