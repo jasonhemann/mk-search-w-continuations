@@ -1,0 +1,93 @@
+map-join-with-dan.rkt
+
+This version had the original sk/fk behavior, and wasn't where it
+needed to go yet.
+
+map-join-with-dan-2.rkt
+
+This is where we first inserted the dk, although not yet at the right
+places and positions.
+
+map-join-with-dan-3.rkt
+
+This is the area where we put in the nat streams, before jumping deep
+end into the other streams stuff.
+
+map-join-with-dan-4.rkt
+
+Dan and I were trying to understand the behavior of the just nats
+streams stuff, and that was still confusing, and figuring out the
+behavior of the interleaving was tricky. So, what we had to do instead
+was to break it down to a little cycle of $n$ (3) relations, so we
+could watch that.
+
+map-join-with-dan-5.rkt
+
+We decided that the sk didn't take a dk; the only place this
+manifested in the main code (outside of "run" or what have you) was in
+the (lambda (b) of the map, which now no longer takes a dk. This file
+defined bind in terms of map and join, so we needed no other changes.
+
+map-join-with-dan-6.rkt
+
+We moved the dk from the middle, to being last. Which I now think was
+the wrong decision, but didn't know that at the time. I think I was
+thinking about having it curried out, and currying it out from the
+front rather than from the back.
+
+map-join-with-dan-7.rkt
+
+This is where we tried to implement bind as bind, and round-trip it so
+that we implemented join and map via bind. Doesn't look fully
+successful right now, b/c this implementation of bind has map and join
+embedded in it.
+
+There's another, better put together bind in this same file, that has
+bind's sk pulled out (in-code comment used the anaphora 'it') into a
+separate top-level function. And it looks significantly cleaner (I marvelled at that).
+
+But I have trouble here and right now understanding how we got to
+here. I might have to re-derive these bind implementations from here.
+
+map-join-with-dan-7b.rkt
+
+Here it looks like we went and moved the fk back after the dk. We also
+introduced Mitch's star operator, which I can't precisely remember or
+understand right now.
+
+This at least looks correct viz. the bind vs. map and join
+situation. I think I've eta'd out the fk here, but it seems at least
+like I've got the recursive bind lining up correctly.
+
+The bottom of this file has two interesting commented out definitions
+of bind. I don't know how, but the last one seemingly removed the map
+and join from the penultimate one, into a single recursive bind.
+
+map-join-with-dan-8.rkt
+
+This backed off of Mitch's star operator. 
+
+It also has a bind with an sk that eats a result of a computation, and
+then an fk. And I don't know if that makes sense or not. But it seems
+to drop the dk. 
+
+Upon further look, not sure this was a good file to go from. Might
+have been a lacuna/eddy/mistake file.
+
+map-join-with-dan-8b.rkt
+
+compare against 7b, actually. We did swap the order of the arguments
+into bind w/dk first, but I think skipped the implementations of map and join.
+
+map-join-with-dan-8c.rkt
+
+Really, this one is almost just reformatting and better printing
+
+map-join-with-dan-9.rkt
+
+This seems to remove the newstar operation that was in 8c. 
+
+map-join-with-dan-10.rkt
+
+I believe this was merely uncurrying; attempting to make things a bit
+clearer and cleaner.
