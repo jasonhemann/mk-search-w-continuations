@@ -16,7 +16,7 @@ it. None of them mention the state right now. Not sure how that worked
 or if they needed to, but for just basic stream operations, we
 needn't.
 
-3. Construct an appropriate run of these monads
+2. Construct an appropriate run of these monads
 
 |#
 
