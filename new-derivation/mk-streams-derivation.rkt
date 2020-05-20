@@ -4,14 +4,28 @@
 
 There will be three tricks here.
 
-1. Try and combine into the 3k model 
+1. Install the recursive delay operator, that is the additional
+superpower endowed by this model.
 
-2. Construct an appropriate run of these monads
+Unlike the others, this *does* require a macro to implement this
+operator. I expect all 4 versions, in all 4 modules, will require
+macros to implement. 
+
+Notice that this define-relation does /not/ have the state embedded in
+it. None of them mention the state right now. Not sure how that worked
+or if they needed to, but for just basic stream operations, we
+needn't.
+
+3. Construct an appropriate run of these monads
 
 |#
 
 (module streams-unit-map-join racket
   (require (combine-in rackunit racket/promise))
+  (provide (all-defined-out))
+
+  (define-syntax-rule (define-relation (n . args) g)
+    (define ((n . args) (delay/name g))))
   
   (define (unit a) (list a))
 
@@ -44,6 +58,10 @@ There will be three tricks here.
 
 (module streams-bind-return racket
   (require (combine-in rackunit racket/promise))
+  (provide (all-defined-out))
+
+  (define-syntax-rule (define-relation (n . args) g)
+    (define ((n . args) (delay/name g))))
   
   (define (return a) (cons a '()))
 
@@ -72,14 +90,17 @@ There will be three tricks here.
   )
 
 
-;; So from here, we're going to introduce the 3rd continuation, for
-;; delays.
-
 (module sk/fk-unit-map-join racket
   (require rackunit)
+  (provide (all-defined-out))
+
+  (define-syntax-rule (define-relation (n . args) g)
+    (define ((n . args)
+             (λ (dk)
+               (λ (sk)
+                 (λ (fk)
+                   (dk g)))))))
   
-  ;; The first two are easy, their functionality does not change as a
-  ;; result.
   (define (unit a)
     (λ (dk)
       (λ (sk)
@@ -92,19 +113,16 @@ There will be three tricks here.
         (λ (fk)
           (fk)))))
 
-  ;; This one matters. 
-
-  ;; The dk takes an sk and an fk, the resumptive behavior needs to
-  ;; know how to continue and how to fail.
-  
   (define (mplus m1 m2)
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          ((m1 sk) ;; this is off, b/c need dk
+          (((m1
+             (λ (c1^)
+               (dk ((mplus m2) c1^))))
+            sk)
            (λ ()
-             ((m2 sk)
-              fk)))))))
+             (((m2 dk) sk) fk)))))))
   
   (define ((map f) m)
     (λ (dk)
@@ -140,6 +158,14 @@ There will be three tricks here.
 
 (module sk/fk-bind-return racket
   (require rackunit)
+  (provide (all-defined-out))
+
+  (define-syntax-rule (define-relation (n . args) g)
+    (define ((n . args)
+             (λ (dk)
+               (λ (sk)
+                 (λ (fk)
+                   (dk g)))))))
   
   (define (return a)
     (λ (dk)
