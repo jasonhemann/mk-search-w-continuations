@@ -97,15 +97,16 @@ This step was
 
   ;; The dk takes an sk and an fk, the resumptive behavior needs to
   ;; know how to continue and how to fail.
-  
   (define (mplus m1 m2)
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          ((m1 sk) ;; this is off, b/c need dk
+          (((m1
+             (λ (c1^)
+               (dk ((mplus m2) c1^))))
+            sk)
            (λ ()
-             ((m2 sk)
-              fk)))))))
+             (((m2 dk) sk) fk)))))))
   
   (define ((map f) m)
     (λ (dk)
