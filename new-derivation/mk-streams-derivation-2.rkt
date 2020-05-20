@@ -32,7 +32,7 @@ This step was
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      ((cons? m1) (cons (car m1) (mplus (cdr m1))))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
 
   (define (return a)
     (unit a))
@@ -59,7 +59,7 @@ This step was
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      ((cons? m1) (cons (car m1) (mplus (cdr m1))))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
   
   (define (unit a)
     (return a))
