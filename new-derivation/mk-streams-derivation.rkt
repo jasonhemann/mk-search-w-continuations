@@ -25,7 +25,7 @@ needn't.
   (provide (all-defined-out))
 
   (define-syntax-rule (define-relation (n . args) g)
-    (define ((n . args) (delay/name g))))
+    (define (n . args) (delay/name g)))
   
   (define (unit a) (list a))
 
@@ -47,7 +47,7 @@ needn't.
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      (cons? m1) (cons (car m1) (mplus (cdr m1 m2)))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m2))))))
 
   (define (return a)
     (unit a))
@@ -61,7 +61,7 @@ needn't.
   (provide (all-defined-out))
 
   (define-syntax-rule (define-relation (n . args) g)
-    (define ((n . args) (delay/name g))))
+    (define (n . args) (delay/name g)))
   
   (define (return a) (cons a '()))
 
@@ -77,7 +77,7 @@ needn't.
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      (cons? m1) (cons (car m1) (mplus (cdr m1 m2)))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m2))))))
   
   (define (unit a)
     (return a))
@@ -89,17 +89,16 @@ needn't.
     ((bind z) (λ (a) a)))
   )
 
-
 (module sk/fk-unit-map-join racket
   (require rackunit)
   (provide (all-defined-out))
 
   (define-syntax-rule (define-relation (n . args) g)
-    (define ((n . args)
-             (λ (dk)
-               (λ (sk)
-                 (λ (fk)
-                   (dk g)))))))
+    (define (n . args)
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (dk g))))))
   
   (define (unit a)
     (λ (dk)
@@ -155,17 +154,16 @@ needn't.
     (join ((map f) m)))
   )
 
-
 (module sk/fk-bind-return racket
   (require rackunit)
   (provide (all-defined-out))
 
   (define-syntax-rule (define-relation (n . args) g)
-    (define ((n . args)
-             (λ (dk)
-               (λ (sk)
-                 (λ (fk)
-                   (dk g)))))))
+    (define (n . args)
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (dk g))))))
   
   (define (return a)
     (λ (dk)

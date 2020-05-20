@@ -44,7 +44,7 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      (cons? m1) (cons (car m1) (mplus (cdr m1 m2)))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m2))))))
 
   ;; The derived behaviors
   (define (return a)
@@ -74,7 +74,7 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
-      (cons? m1) (cons (car m1) (mplus (cdr m1 m2)))))
+      ((cons? m1) (cons (car m1) (mplus (cdr m2))))))
   
   ;; The derived behaviors
   (define (unit a)
