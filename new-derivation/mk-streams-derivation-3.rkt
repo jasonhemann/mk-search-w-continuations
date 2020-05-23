@@ -101,12 +101,9 @@ needn't.
             (((dk g) sk) fk))))))
 
   (define (unit a)
-    (pretty-print "eating our ks")
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          (pretty-print "ate our ks")
-          (pretty-print `((,sk ,a) ,fk))
           ((sk a) fk)))))
 
   (define (mzero)
@@ -121,7 +118,7 @@ needn't.
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))
@@ -200,7 +197,7 @@ needn't.
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))

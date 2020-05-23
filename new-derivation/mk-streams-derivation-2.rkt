@@ -103,7 +103,7 @@ This step was
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))
@@ -176,7 +176,7 @@ This step was
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))

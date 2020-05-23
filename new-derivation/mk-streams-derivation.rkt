@@ -2,7 +2,7 @@
 
 #| 
 
-There will be three tricks here.
+There will be two tricks here.
 
 1. Install the recursive delay operator, that is the additional
 superpower endowed by this model.
@@ -118,7 +118,7 @@ needn't.
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))
@@ -197,7 +197,7 @@ needn't.
         (λ (fk)
           (((m1
              (λ (c1^)
-               (dk ((mplus m2) c1^))))
+               (dk (mplus m2 c1^))))
             sk)
            (λ ()
              (((m2 dk) sk) fk)))))))

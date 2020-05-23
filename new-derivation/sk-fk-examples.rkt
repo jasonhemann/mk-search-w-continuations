@@ -35,66 +35,27 @@ what if we fail, what if we delay.
 
 |#
 
-(trace-define kons (λ (a) (trace-lambda #:name kons-inner (fk) (cons a (fk)))))
-(trace-define nill (λ () '()))
+(define kons (λ (a) (λ (fk) (cons a (fk)))))
+(define nill (λ () '()))
+
 ;; It's not clear what this should do.
 ;; We could implement a run* behavior.
 ;; We could also implement some run $n behavior
 ;; Where we could be tracking the actual number of answers
 ;; We could be tracking the number of pulls
 ;; We could be tracking just /whether/ or not it comes back with an answer
-;; ((((mzero) loop) kons) nill)
-;; ((((unit 5) loop) kons) nill)
-
-;; Something about this doesn't work because as we come through, we
-;; lose an fk, or the sk. It's complex and complicated. 
-
-
-;; I construct the (d 5)
-;; That's a monadic computation
-;; So we have to pass it
-;; init dk (loop)
-;; init sk (kons)
-;; init fk (nill)
-
-;; That computation should then, AFAIK, invoke the dk
-;; What should then happen once we invoke the dk. Since it's delayed?
-;; At least in a run*, it should continue that computation
-;; the delay should continue the computation
-;; What should it mean for the delay to continue this computation?
-
-;; Ultimately I think it should mean that we call g again with _a_ dk
-;; and also that same sk and fk.
-
-
-
-;; Think more about what should happen w/two answers. 
-
-;; (define loop
-;;   (λ (c)
-;;     (pretty-print "eating the sk and fk now")
-;;     (λ (sk)
-;;       (λ (fk)
-;;         (pretty-print `(((,c ,loop) ,sk) ,fk))
-;;         (let ((f (c loop)))
-;;           (pretty-print "computed (c loop)")
-;;           (let ((g (f sk)))
-;;             (pretty-print "computed ((c loop) sk)")
-;;             (let ((h (g fk)))
-;;               (pretty-print "computed (((c loop) sk) fk)")
-;;               h)))))))
-
-
 (define loop
   (λ (c)
     (λ (sk)
       (λ (fk)
         (((c loop) sk) fk)))))
 
-;; This is somehow returning the empty failure continuation...
-;; (((((d 5) loop) kons) nill))
+(check-equal? '() ((((mzero) loop) kons) nill))
+(check-equal? '(5) ((((unit 5) loop) kons) nill))
 
-((((unit 5) loop) kons) nill)
+;; Think more about what should happen w/two answers. 
+
+
 
 (define-relation (a n)
   (b n))
@@ -105,7 +66,8 @@ what if we fail, what if we delay.
 (define-relation (d n)
   (unit n))
 
-;; ((((d 5) loop) kons) nill)
+(check-equal? '(5) ((((d 5) loop) kons) nill))
+(check-equal? '(5) ((((a 5) loop) kons) nill))
 
 ;; (check-pred promise? (a 5))
 ;; (check-pred promise? (force (a 5))) 
@@ -139,7 +101,6 @@ what if we fail, what if we delay.
 (define-relation (m n)
   (mplus (l n) (unit n)))
 
-((((d 5) loop) kons) nill)
 ;; (check-pred promise? (force (l 5)))
 ;; (check-pred promise? (force (force (l 5))))
 ;; (check-match (force (force (force (l 5)))) (cons 5 x) (promise? x))
