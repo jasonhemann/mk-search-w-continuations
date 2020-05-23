@@ -3,8 +3,8 @@
 (require racket/trace)
 ;; (require (submod "mk-streams-derivation-3.rkt" streams-unit-map-join))
 ;; (require (submod "mk-streams-derivation-3.rkt" streams-bind-return))
-;; (require (submod "mk-streams-derivation-3.rkt" sk/fk-unit-map-join))
-(require (submod "mk-streams-derivation-3.rkt" sk/fk-bind-return))
+(require (submod "mk-streams-derivation-3.rkt" sk/fk-unit-map-join))
+;; (require (submod "mk-streams-derivation-3.rkt" sk/fk-bind-return))
 
 #| 
 
@@ -13,6 +13,9 @@ implementations, and to show that they all work the same or
 independent of one another, to get the right answers out.
 
 |#
+
+;; Suspicious that my implementations maybe don't exactly describe
+;; the mK search as I want to here. 
 
 (define kons (λ (a) (λ (fk) (cons a (fk)))))
 (define nill (λ () '()))
@@ -35,10 +38,18 @@ independent of one another, to get the right answers out.
             '()
             (((c (loop (sub1 n))) sk) fk))))))
 
-;; We could be tracking just /whether/ or not it comes back with an answer
 
-;; Could we be easily tracking the actual number of answers? I don't
-;; know how.
+;; Alt definition where we re-start with the initial sk and fk? 
+(define (loop2 n)
+  (λ (c)
+    (λ (sk)
+      (λ (fk)
+        (if (zero? n)
+            '()
+            (((c (loop2 (sub1 n))) kons) nill))))))
+
+;; We could track just /whether/ or not it comes back with _an_ answer.
+;; Could we be easily track the no. of answers? I don't know how.
 
 (check-equal? '() ((((mzero) (loop -1)) kons) nill))
 (check-equal? '(5) ((((unit 5) (loop -1)) kons) nill))
@@ -86,3 +97,7 @@ independent of one another, to get the right answers out.
 ;; This indicates that we are measuring the number of pulls, not the number of answers.
 (check-equal? 98 (length ((((mplus (l 5) (l 6)) (loop 50)) kons) nill)))
 
+(define-relation (unproductiveo x)
+  (unproductiveo x))
+
+(check-equal? '() ((((unproductiveo 5) (loop 50)) kons) nill))
