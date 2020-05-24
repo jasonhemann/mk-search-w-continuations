@@ -211,7 +211,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
                (dk (join mm^))))
             (λ (mb)
               (λ (fk)
-                ((mb sk) fk))))
+                (((mb dk) sk) fk))))
            fk)))))
 
   (define (return a)
