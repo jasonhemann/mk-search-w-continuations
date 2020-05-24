@@ -138,6 +138,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   )
 
 (module sk/fk-unit-map-join racket
+  (require racket/trace)
   (require rackunit)
   (provide (all-defined-out))
 
@@ -202,7 +203,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
                 ((sk (f b)) fk))))
            fk)))))
 
-  (define (join mma)
+  (trace-define (join mma)
     (λ (dk)
       (λ (sk)
         (λ (fk)
@@ -211,7 +212,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
                (dk (join mm^))))
             (λ (mb)
               (λ (fk)
-                ((mb sk) fk))))
+                (((mb dk) sk) fk))))
            fk)))))
 
   (define (return a)
