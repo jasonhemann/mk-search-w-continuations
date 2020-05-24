@@ -203,7 +203,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
                 ((sk (f b)) fk))))
            fk)))))
 
-  (trace-define (join mma)
+  (define (join mma)
     (λ (dk)
       (λ (sk)
         (λ (fk)
