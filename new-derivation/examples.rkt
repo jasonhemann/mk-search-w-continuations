@@ -1,5 +1,7 @@
 #lang racket
 (require rackunit)
+
+;; Any one of these 4
 ;; (require (submod "mk-streams-derivation.rkt" streams-unit-map-join))
 ;; (require (submod "mk-streams-derivation.rkt" streams-bind-return))
 ;; (require (submod "mk-streams-derivation.rkt" sk/fk-unit-map-join))
@@ -113,10 +115,36 @@ independent of one another, to get the right answers out.
            (f 1))
           (mplus
            (b 1)
-           (d 1))))))
+           (d 1)))))))
+
+(check-equal? '() (run ((bind (mzero)) (λ (n) (mzero)))))
+(check-equal? '() (run ((bind (mzero)) (λ (n) (unit 5)))))
+
+(check-equal? '()   (run ((bind (unit 5)) (λ (n) (mzero)))))
+(check-equal? '(25) (run ((bind (unit 5)) (λ (n) (unit (* n n))))))
+
+(define-relation (nearly n)
+  (unit n))
+
+(check-equal? '()   (run ((bind (nearly 5)) (λ (n) (mzero)))))
+(check-equal? '(25) (run ((bind (nearly 5)) (λ (n) (unit (* n n))))))
+
+;; (define-relation (a n)
+;;   (mplus (unit n) (b (add1 n))))
+
+;; (define-relation (b n)
+;;   (mplus (unit n) (c (add1 n))))
+
+;; (define-relation (c n)
+;;   (mplus (unit n) (d (add1 n))))
+
+;; (define-relation (d n)
+;;   (unit n))
+
+;; (run ((bind (a 5)) (λ (n) (a (* n n)))))
 
 
-  )
+
 
 
 

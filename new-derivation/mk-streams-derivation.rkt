@@ -254,7 +254,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   
   (define (return a)
     (λ (dk)
-      (trace-lambda #:name return-eats-sk (sk)
+      (λ (sk)
         (λ (fk)
           ((sk a) fk)))))
 
@@ -267,7 +267,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
                (dk ((bind m^) f))))
             (λ (b)
               (λ (fk)
-                (((f b)
+                ((((f b)
+                   dk)
                   sk)
                  fk))))
            fk)))))
