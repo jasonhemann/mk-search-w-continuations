@@ -13,6 +13,10 @@ independent of one another, to get the right answers out.
 
 |#
 
+;; Obviously there are multiple ways to split this up.
+;; Not sure what the "correct" one is, so I'm not.
+;;
+
 (test-begin 
   (define-relation (a n)
     (b n))
@@ -23,11 +27,7 @@ independent of one another, to get the right answers out.
   (define-relation (d n)
     (unit n))
 
-  (check-pred promise? (a 5))
-  (check-pred promise? (force (a 5))) 
-  (check-pred promise? (force (force (a 5)))) 
-  (check-pred promise? (force (force (force (a 5)))))
-  (check-equal? '(5) (force (force (force (force (a 5))))))
+  (check-equal? '(5) (run (a 5)))
   
   (define-relation (h n)
     (i n))
@@ -36,39 +36,14 @@ independent of one another, to get the right answers out.
   (define-relation (j n)
     (mplus (h n) (a n)))
 
-  (check-pred promise? (force (force (force (force (force (force (force (h 5)))))))))
-  (check-pred promise? (force (force (force (force (force (force (force (force (h 5))))))))))
-  (check-pred promise? (force (force (force (force (force (force (force (force (force (h 5)))))))))))
-  (check-pred promise? (force (force (force (force (force (force (force (force (force (force (force (h 5)))))))))))))
-  (check-match (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))) (cons 5 x) (promise? x))  
-  (check-pred promise? (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))))))
-  (check-pred promise? (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5)))))))))))))))))
-  (check-pred promise? (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))))))))
-  (check-pred promise? (force (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5)))))))))))))))))))
-  (check-pred promise? (force (force (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))))))))))
-  (check-pred promise? (force (force (force (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5)))))))))))))))))))))
-  (check-match (force (force (force (force (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))))))))))) (cons 5 x) (promise? x))
-  (check-pred promise? (force (cdr (force (force (force (force (force (force (force (cdr (force (force (force (force (force (force (force (force (force (force (force (force (h 5))))))))))))))))))))))))
+  (check-equal? '(5 5) (run 20 (h 5)))
 
   (define-relation (l n)
     (m n))
   (define-relation (m n)
     (mplus (l n) (unit n)))
 
-  (check-pred promise? (force (l 5)))
-  (check-pred promise? (force (force (l 5))))
-  (check-match (force (force (force (l 5)))) (cons 5 x) (promise? x))
-  (check-pred promise? (force (cdr (force (force (force (l 5)))))))
-  (check-match (force (force (cdr (force (force (force (l 5))))))) (cons 5 x) (promise? x))
-  (check-pred promise? (cdr (force (force (cdr (force (force (force (l 5)))))))))
-  (check-pred promise? (cdr (force (force (cdr (force (force (force (l 5)))))))))
-  (check-pred promise? (force (cdr (force (force (cdr (force (force (force (l 5))))))))))
-  (check-match (force (force (cdr (force (force (cdr (force (force (force (l 5)))))))))) (cons 5 x) (promise? x))
-  (check-pred promise? (cdr (force (force (cdr (force (force (cdr (force (force (force (l 5))))))))))))
-  (check-pred promise? (force (cdr (force (force (cdr (force (force (cdr (force (force (force (l 5)))))))))))))
-  (check-pred promise? (force (cdr (force (force (cdr (force (force (cdr (force (force (force (l 5)))))))))))))
-  (check-pred promise? (cdr (force (force (cdr (force (force (cdr (force (force (force (l 5))))))))))))
-  (check-match (force (force (cdr (force (force (cdr (force (force (force (l 5)))))))))) (cons 5 x) (promise? x))
+  (check-equal? '(5 5) (run 7 (l 5)))
   )
 
 (test-begin 
@@ -79,11 +54,62 @@ independent of one another, to get the right answers out.
   (define-relation (g n)
     (e n))
 
-  (check-pred promise? (e 5))
-  (check-pred promise? (force (e 5)))
-  (check-pred promise? (force (force (force (e 5)))))
-  (check-pred promise? (force (force (force (force (force (e 5)))))))
-  (check-pred promise? (force (force (force (force (force (force (force (e 5)))))))))
+  (check-equal? '() (run 7 (e 5)))
   )
+
+
+(test-begin 
+  (define-relation (m n)
+    (mplus (unit n) (m n)))
+
+  (run 5 (mplus (m 5) (m 6)))
+
+  (check-equal? 49 (run 50 (mplus (m 5) (m 6))))
+  (check-equal? '(5 6 5 6) (run 5 (mplus (m 5) (m 6))))
+)
+
+;; This seems promising, don't know if it's right.
+
+(test-begin 
+  (define-relation (a n)
+    (mplus (unit 'a) (b (add1 n))))
+
+  (define-relation (b n)
+    (mplus (c (add1 n)) (unit 'b)))
+
+  (define-relation (c n)
+    (unit 'c))
+
+  (define-relation (d n)
+    (mplus (e (add1 n)) (unit 'd)))
+
+  (define-relation (e n)
+    (mplus (unit 'e) (f (add1 n))))
+
+  (define-relation (f n)
+    (unit 'f))
+
+  (loop* (mplus
+          (mplus
+           (mplus
+            (c 1)
+            (unit 'u))
+           (mplus
+            (e 1)
+            (mplus
+             (a 1)
+             (unit 'w))))
+          (mplus
+           (mplus
+            (unit 'v)
+            (f 1))
+           (mplus
+            (b 1)
+            (d 1)))))
+
+
+  )
+
+
 
 

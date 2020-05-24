@@ -98,7 +98,7 @@ needn't.
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk g) sk) fk))))))
+            (dk g))))))
 
   (define (unit a)
     (λ (dk)
@@ -163,7 +163,7 @@ needn't.
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk g) sk) fk))))))
+            (dk g))))))
   
   (define (return a)
     (λ (dk)
