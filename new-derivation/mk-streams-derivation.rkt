@@ -9,33 +9,33 @@ Not _entirely_ sure I'm happy with the walk-ans-es
 |#
 
 (module streams-unit-map-join racket
-  (require (combine-in rackunit racket/promise))
+  (require (combine-in rackunit racket/promise racket/trace))
   (provide (all-defined-out))
 
   ;; Ugly external interface for cover
-  (define (run . args)
+  (trace-define (run . args)
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
   
-  (define (walk-ans* c)
+  (trace-define (walk-ans* c)
     (cond
       ((null? c) '())
       ((cons? c) (cons (car c) (walk-ans* (cdr c))))
       (else (loop* c))))
 
-  (define (loop* c)
+  (trace-define (loop* c)
     (cond
       ((promise? c) (loop* (force c)))
       (else (walk-ans* c))))
 
-  (define ((walk-ans n) c)
+  (trace-define ((walk-ans n) c)
     (cond
       ((null? c) '())
       ((cons? c) (cons (car c) ((walk-ans n) (cdr c))))
       (else ((loop n) c))))
 
-  (define ((loop n) c)
+  (trace-define ((loop n) c)
     (cond
       ((promise? c)
        (if (zero? n) '()
@@ -45,32 +45,32 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
   
-  (define (unit a) (list a))
+  (trace-define (unit a) (list a))
 
-  (define ((map m) f)
+  (trace-define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map m) f))) 
-      ((cons? m) (cons (f m) ((map (cdr m)) f)))))
+      ((promise? m) (delay/name ((map f) m))) 
+      ((cons? m) (cons (f m) ((map f) (cdr m))))))
 
-  (define (join mma)
+  (trace-define (join mma)
     (cond
       ((null? mma) '())
       ((promise? mma) mma)
       ((cons? mma) (mplus (car mma) (join (cdr mma))))))
 
-  (define (mzero) '())
+  (trace-define (mzero) '())
   
-  (define (mplus m1 m2)
+  (trace-define (mplus m1 m2)
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
       ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
 
-  (define (return a)
+  (trace-define (return a)
     (unit a))
 
-  (define ((bind m) f)
+  (trace-define ((bind m) f)
     (join ((map f) m)))
   )
 

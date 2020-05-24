@@ -24,11 +24,11 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
   ;; These definitions came largely from the Danvy paper
   ;; Wasn't immediately clear how to write the promise lines for
   ;; map/join, but got here because map must return a single value
-  (define ((map m) f)
+  (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map m) f))) 
-      ((cons? m) (cons (f m) ((map (cdr m)) f)))))
+      ((promise? m) (delay/name ((map f) m))) 
+      ((cons? m) (cons (f m) ((map f) (cdr m))))))
 
 
   (define (join mma)

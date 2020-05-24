@@ -14,11 +14,11 @@ This step was
   
   (define (unit a) (list a))
 
-  (define ((map m) f)
+  (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map m) f))) 
-      ((cons? m) (cons (f m) ((map (cdr m)) f)))))
+      ((promise? m) (delay/name ((map f) m))) 
+      ((cons? m) (cons (f m) ((map f) (cdr m))))))
 
   (define (join mma)
     (cond
