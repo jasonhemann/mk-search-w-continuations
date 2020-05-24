@@ -117,31 +117,36 @@ independent of one another, to get the right answers out.
            (b 1)
            (d 1)))))))
 
-(check-equal? '() (run ((bind (mzero)) (λ (n) (mzero)))))
-(check-equal? '() (run ((bind (mzero)) (λ (n) (unit 5)))))
+(test-begin 
+  (check-equal? '() (run ((bind (mzero)) (λ (n) (mzero)))))
+  (check-equal? '() (run ((bind (mzero)) (λ (n) (unit 5)))))
 
-(check-equal? '()   (run ((bind (unit 5)) (λ (n) (mzero)))))
-(check-equal? '(25) (run ((bind (unit 5)) (λ (n) (unit (* n n))))))
+  (check-equal? '()   (run ((bind (unit 5)) (λ (n) (mzero)))))
+  (check-equal? '(25) (run ((bind (unit 5)) (λ (n) (unit (* n n))))))
 
-(define-relation (nearly n)
-  (unit n))
+  (test-begin 
+    (define-relation (a n)
+      (mplus (unit n) (b (add1 n))))
 
-(check-equal? '()   (run ((bind (nearly 5)) (λ (n) (mzero)))))
-(check-equal? '(25) (run ((bind (nearly 5)) (λ (n) (unit (* n n))))))
+    (define-relation (b n)
+      (mplus (unit n) (c (add1 n))))
 
-;; (define-relation (a n)
-;;   (mplus (unit n) (b (add1 n))))
+    (define-relation (c n)
+      (mplus (unit n) (d (add1 n))))
 
-;; (define-relation (b n)
-;;   (mplus (unit n) (c (add1 n))))
+    (define-relation (d n)
+      (unit n))
 
-;; (define-relation (c n)
-;;   (mplus (unit n) (d (add1 n))))
+    (check-equal? '(25 26 27 28) (run ((bind (a 5)) (λ (n) (a (* n n))))))
+    )
+  
+  (define-relation (nearly n)
+    (unit n))
 
-;; (define-relation (d n)
-;;   (unit n))
+  (check-equal? '()   (run ((bind (nearly 5)) (λ (n) (mzero)))))
+  (check-equal? '(25) (run ((bind (nearly 5)) (λ (n) (unit (* n n))))))
+  )
 
-;; (run ((bind (a 5)) (λ (n) (a (* n n)))))
 
 
 
