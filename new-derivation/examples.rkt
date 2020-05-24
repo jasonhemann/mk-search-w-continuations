@@ -1,9 +1,9 @@
 #lang racket
 (require rackunit)
-(require (submod "mk-streams-derivation.rkt" streams-unit-map-join))
+;; (require (submod "mk-streams-derivation.rkt" streams-unit-map-join))
 ;; (require (submod "mk-streams-derivation.rkt" streams-bind-return))
 ;; (require (submod "mk-streams-derivation.rkt" sk/fk-unit-map-join))
-;; (require (submod "mk-streams-derivation.rkt" sk/fk-bind-return))
+(require (submod "mk-streams-derivation.rkt" sk/fk-bind-return))
 
 #| 
 
@@ -12,10 +12,6 @@ implementations, and to show that they all work the same or
 independent of one another, to get the right answers out.
 
 |#
-
-;; Obviously there are multiple ways to split this up.
-;; Not sure what the "correct" one is, so I'm not.
-;;
 
 (test-begin 
   (define-relation (a n)
@@ -27,7 +23,20 @@ independent of one another, to get the right answers out.
   (define-relation (d n)
     (unit n))
 
+  (check-equal? '(5) (run (d 5)))
   (check-equal? '(5) (run (a 5)))
+
+  (test-begin 
+    (define-relation (e n)
+      (f n))
+    (define-relation (f n)
+      (g n))
+    (define-relation (g n)
+      (e n))
+
+    (check-equal? '() (run 7 (e 5)))
+    (check-equal? '(5) (run 500 (mplus (e 5) (a 5))))
+    )
   
   (define-relation (h n)
     (i n))
@@ -43,33 +52,30 @@ independent of one another, to get the right answers out.
   (define-relation (m n)
     (mplus (l n) (unit n)))
 
-  (check-equal? '(5 5) (run 7 (l 5)))
+  (check-equal? '(5 5 5) (run 7 (l 5)))
   )
-
-(test-begin 
-  (define-relation (e n)
-    (f n))
-  (define-relation (f n)
-    (g n))
-  (define-relation (g n)
-    (e n))
-
-  (check-equal? '() (run 7 (e 5)))
-  )
-
 
 (test-begin 
   (define-relation (m n)
     (mplus (unit n) (m n)))
 
-  (run 5 (mplus (m 5) (m 6)))
-
-  (check-equal? 49 (run 50 (mplus (m 5) (m 6))))
+  (check-equal? 49 (length (run 50 (mplus (m 5) (m 6)))))
   (check-equal? '(5 6 5 6) (run 5 (mplus (m 5) (m 6))))
-)
+  )
+
+(test-begin 
+ (define-relation (l n)
+   (mplus (unit n) (mplus (unit n) (l n))))
+
+ ;; This indicates that we are measuring the number of pulls, not the number of answers.
+ (check-equal? 98 (length (run 50 (mplus (l 5) (l 6)))))
+
+ (define-relation (unproductiveo x)
+   (unproductiveo x))
+
+ (check-equal? '() (run 50 (unproductiveo 5))))
 
 ;; This seems promising, don't know if it's right.
-
 (test-begin 
   (define-relation (a n)
     (mplus (unit 'a) (b (add1 n))))
@@ -89,23 +95,25 @@ independent of one another, to get the right answers out.
   (define-relation (f n)
     (unit 'f))
 
-  (loop* (mplus
+  (check-equal?
+   '(v u c f e w a f b c d e b c f)
+   (run (mplus
+         (mplus
           (mplus
-           (mplus
-            (c 1)
-            (unit 'u))
-           (mplus
-            (e 1)
-            (mplus
-             (a 1)
-             (unit 'w))))
+           (c 1)
+           (unit 'u))
           (mplus
+           (e 1)
            (mplus
-            (unit 'v)
-            (f 1))
-           (mplus
-            (b 1)
-            (d 1)))))
+            (a 1)
+            (unit 'w))))
+         (mplus
+          (mplus
+           (unit 'v)
+           (f 1))
+          (mplus
+           (b 1)
+           (d 1))))))
 
 
   )
