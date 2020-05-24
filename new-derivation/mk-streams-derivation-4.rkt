@@ -144,8 +144,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
@@ -228,8 +228,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))

@@ -144,8 +144,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
@@ -222,14 +222,15 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   )
 
 (module sk/fk-bind-return racket
+  (require racket/trace)
   (require rackunit)
   (provide (all-defined-out))
 
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
@@ -253,7 +254,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   
   (define (return a)
     (λ (dk)
-      (λ (sk)
+      (trace-lambda #:name return-eats-sk (sk)
         (λ (fk)
           ((sk a) fk)))))
 
