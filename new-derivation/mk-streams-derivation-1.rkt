@@ -28,7 +28,7 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
     (cond
       ((null? m) '())
       ((promise? m) (delay/name ((map f) m))) 
-      ((cons? m) (cons (f m) ((map f) (cdr m))))))
+      ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
 
   (define (join mma)

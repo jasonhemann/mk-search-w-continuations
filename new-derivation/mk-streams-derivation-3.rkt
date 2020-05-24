@@ -32,8 +32,8 @@ needn't.
   (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map f) m))) 
-      ((cons? m) (cons (f m) ((map f) (cdr m))))))
+      ((promise? m) (delay/name (join ((map f) (force m))))) 
+      ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
   (define (join mma)
     (cond

@@ -13,29 +13,29 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (provide (all-defined-out))
 
   ;; Ugly external interface for cover
-  (trace-define (run . args)
+  (define (run . args)
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
   
-  (trace-define (walk-ans* c)
+  (define (walk-ans* c)
     (cond
       ((null? c) '())
       ((cons? c) (cons (car c) (walk-ans* (cdr c))))
       (else (loop* c))))
 
-  (trace-define (loop* c)
+  (define (loop* c)
     (cond
       ((promise? c) (loop* (force c)))
       (else (walk-ans* c))))
 
-  (trace-define ((walk-ans n) c)
+  (define ((walk-ans n) c)
     (cond
       ((null? c) '())
       ((cons? c) (cons (car c) ((walk-ans n) (cdr c))))
       (else ((loop n) c))))
 
-  (trace-define ((loop n) c)
+  (define ((loop n) c)
     (cond
       ((promise? c)
        (if (zero? n) '()
@@ -45,32 +45,32 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
   
-  (trace-define (unit a) (list a))
+  (define (unit a) (list a))
 
-  (trace-define ((map f) m)
+  (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map f) m))) 
-      ((cons? m) (cons (f m) ((map f) (cdr m))))))
+      ((promise? m) (delay/name (join ((map f) (force m)))))
+      ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
-  (trace-define (join mma)
+  (define (join mma)
     (cond
       ((null? mma) '())
       ((promise? mma) mma)
       ((cons? mma) (mplus (car mma) (join (cdr mma))))))
 
-  (trace-define (mzero) '())
+  (define (mzero) '())
   
-  (trace-define (mplus m1 m2)
+  (define (mplus m1 m2)
     (cond
       ((null? m1) m2)
       ((promise? m1) (delay/name (mplus m2 (force m1))))
       ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
 
-  (trace-define (return a)
+  (define (return a)
     (unit a))
 
-  (trace-define ((bind m) f)
+  (define ((bind m) f)
     (join ((map f) m)))
   )
 
