@@ -118,7 +118,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define ((bind m) f)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (bind (force m) f)))
+      ((promise? m) (delay/name ((bind (force m)) f)))
       ((cons? m) (mplus (f (car m)) ((bind (cdr m)) f)))))
 
   (define (mplus m1 m2)

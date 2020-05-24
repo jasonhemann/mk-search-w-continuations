@@ -52,7 +52,7 @@ This step was
   (define ((bind m) f)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (bind (force m) f)))
+      ((promise? m) (delay/name ((bind (force m)) f)))
       ((cons? m) (mplus (f (car m)) ((bind (cdr m)) f)))))
 
   (define (mplus m1 m2)
