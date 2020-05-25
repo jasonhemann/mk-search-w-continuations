@@ -120,7 +120,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       ((null? m) '())
       ((promise? m) (delay/name ((bind (force m)) f)))
       ((cons? m) (mplus (f (car m)) ((bind (cdr m)) f)))))
-
+  
   (define (mplus m1 m2)
     (cond
       ((null? m1) m2)
@@ -146,7 +146,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define (run . args)
     (cond
       ((null? (cdr args)) (loop* (car args)))
-      (else ((loop (car args)) (cadr args)))))
+      (else ((loop (add1 (car args))) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
@@ -231,20 +231,24 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define (run . args)
     (cond
       ((null? (cdr args)) (loop* (car args)))
-      (else ((loop (car args)) (cadr args)))))
+      (else ((loop (add1 (car args))) (cadr args)))))
   
-  (define kons (λ (a) (λ (fk) (cons a (fk)))))
-  (define nill (λ () '()))
-
   (define (loop n)
     (λ (c)
       (if (zero? n)
           '()
           (((c (loop (sub1 n))) kons) nill))))
 
+  (define kons (λ (a)
+                 (λ (fk)
+                   (cons a (fk)))))
+
+  (define nill (λ ()
+                 '()))
+
   (define loop*
     (λ (c)
-      (((c loop*) kons) nill)))
+     (((c loop*) kons) nill)))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
@@ -300,3 +304,5 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define (join z)
     ((bind z) (λ (a) a)))
   )
+
+
