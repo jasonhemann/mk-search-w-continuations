@@ -44,6 +44,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
+
+  (define-syntax-rule (freeze e) (delay/name e))
   
   (define (unit a) (list a))
 
@@ -110,6 +112,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
+
+  (define-syntax-rule (freeze e) (delay/name e))
   
   (define (return a) (cons a '()))
 
@@ -145,8 +149,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) (loop* (car args)))
-      (else ((loop (add1 (car args))) (cadr args)))))
+      ((null? (cdr args)) ((((car args) loop*) kons) nill))
+      (else ((((cadr args) (loop (car args))) kons) nill))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
@@ -154,8 +158,10 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define (loop n)
     (λ (c)
       (if (zero? n)
-          '()
-          (((c (loop (sub1 n))) kons) nill))))
+          (c (lambda (sk)
+               (lambda (fk)
+                 '())))
+          (c (loop (sub1 n))))))
 
   (define loop*
     (λ (c)
@@ -166,7 +172,13 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (dk g))))))
+            (((dk g) sk) fk))))))
+
+  (define-syntax-rule (freeze e) 
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (((dk e) sk) fk)))))
   
   (define (unit a)
     (λ (dk)
@@ -223,21 +235,23 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   )
 
 (module sk/fk-bind-return racket
-  (require racket/trace)
   (require rackunit)
   (provide (all-defined-out))
 
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) (loop* (car args)))
-      (else ((loop (add1 (car args))) (cadr args)))))
+      ((null? (cdr args)) ((((car args) loop*) kons) nill))
+      (else ((((cadr args) (loop (car args))) kons) nill))))
   
   (define (loop n)
     (λ (c)
       (if (zero? n)
-          '()
-          (((c (loop (sub1 n))) kons) nill))))
+          (c 
+           (lambda (sk)
+             (lambda (fk)
+               '())))
+          (c (loop (sub1 n))))))
 
   (define kons (λ (a)
                  (λ (fk)
@@ -248,15 +262,21 @@ Not _entirely_ sure I'm happy with the walk-ans-es
 
   (define loop*
     (λ (c)
-     (((c loop*) kons) nill)))
-
-  (define-syntax-rule (define-relation (n . args) g)
+      (c loop*)))
+  
+(define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (dk g))))))
-  
+            (((dk g) sk) fk))))))
+
+  (define-syntax-rule (freeze e) 
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (((dk e) sk) fk)))))
+
   (define (return a)
     (λ (dk)
       (λ (sk)
@@ -269,11 +289,16 @@ Not _entirely_ sure I'm happy with the walk-ans-es
         (λ (fk)
           (((m
              (λ (m^)
-               (dk ((bind m^) f))))
+               (((dk ((bind m^) f))
+                 sk)
+                fk)))
             (λ (b)
               (λ (fk)
                 ((((f b)
-                   dk)
+                   (lambda (m^)
+                     (((dk m^)
+                       sk)
+                      fk)))
                   sk)
                  fk))))
            fk)))))
