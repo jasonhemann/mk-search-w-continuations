@@ -492,3 +492,343 @@ independent of one another, to get the right answers out.
                                                       )))))))))))))
 
 
+;; A simple enough program to debug and work through. 
+
+(run ((bind
+       (freeze (return 2)))
+      (lambda (a)
+        (return (* a 5)))))
+
+;;; could not be simpler program
+(run ((bind
+       (freeze (mzero)))
+      (lambda (a) (mzero))))
+
+
+;; (run (letrec 
+;;          ((bind (lambda (m) 
+;;                   (lambda (f)
+;;                     (λ (dk)
+;;                       (λ (sk)
+;;                         (λ (fk)
+;;                           (((m
+;;                              (λ (m^)
+;;                                (((dk ((bind m^) f))
+;;                                  sk)
+;;                                 fk)))
+;;                             (λ (b)
+;;                               (λ (fk)
+;;                                 ((((f b)
+;;                                    (lambda (m^)
+;;                                      (((dk m^)
+;;                                        sk)
+;;                                       fk)))
+;;                                   sk)
+;;                                  fk))))
+;;                            fk)))))
+;;                   )))
+;;        (λ (dk)
+;;          (λ (sk)
+;;            (λ (fk)
+;;              ((((λ (dk)
+;;                   (λ (sk)
+;;                     (λ (fk)
+;;                       (((dk (mzero)) sk) fk))))
+;;                 (λ (m^)
+;;                   (((dk ((bind m^) 
+;;                          (lambda (a) (mzero))))
+;;                     sk)
+;;                    fk)))
+;;                (λ (b)
+;;                  (λ (fk)
+;;                    ((((mzero)
+;;                       (lambda (m^)
+;;                         (((dk m^)
+;;                           sk)
+;;                          fk)))
+;;                      sk)
+;;                     fk))))
+;;               fk))))))
+
+
+;; (run (letrec 
+;;          ((bind (lambda (m) 
+;;                   (lambda (f)
+;;                     (λ (dk)
+;;                       (λ (sk)
+;;                         (λ (fk)
+;;                           (((m
+;;                              (λ (m^)
+;;                                (((dk ((bind m^) f))
+;;                                  sk)
+;;                                 fk)))
+;;                             (λ (b)
+;;                               (λ (fk)
+;;                                 ((((f b)
+;;                                    (lambda (m^)
+;;                                      (((dk m^)
+;;                                        sk)
+;;                                       fk)))
+;;                                   sk)
+;;                                  fk))))
+;;                            fk))))))))
+;;        (λ (dk)
+;;          (λ (sk)
+;;            (λ (fk)
+;;              ((((λ (dk)
+;;                   (λ (sk)
+;;                     (λ (fk)
+;;                       (((dk (λ (dk)
+;;                               (λ (sk)
+;;                                 (λ (fk)
+;;                                   (fk))))) 
+;;                         sk) 
+;;                        fk))))
+;;                 (λ (m^)
+;;                   (((dk ((bind m^) 
+;;                          (lambda (a) 
+;;                            (λ (dk)
+;;                              (λ (sk)
+;;                                (λ (fk)
+;;                                  (fk)))))))
+;;                     sk)
+;;                    fk)))
+;;                (λ (b)
+;;                  (λ (fk)
+;;                    ((((λ (dk)
+;;                         (λ (sk)
+;;                           (λ (fk)
+;;                             (fk))))
+;;                       (lambda (m^)
+;;                         (((dk m^)
+;;                           sk)
+;;                          fk)))
+;;                      sk)
+;;                     fk))))
+;;               fk))))))
+
+
+
+;; (run (letrec 
+;;          ((bind (lambda (m) 
+;;                   (lambda (f)
+;;                     (λ (dk)
+;;                       (λ (sk)
+;;                         (λ (fk)
+;;                           (((m
+;;                              (λ (m^)
+;;                                (((dk ((bind m^) f))
+;;                                  sk)
+;;                                 fk)))
+;;                             (λ (b)
+;;                               (λ (fk)
+;;                                 ((((f b)
+;;                                    (lambda (m^)
+;;                                      (((dk m^)
+;;                                        sk)
+;;                                       fk)))
+;;                                   sk)
+;;                                  fk))))
+;;                            fk))))))))
+;;        (λ (dk)
+;;          (λ (sk)
+;;            (λ (fk)
+;;              (((((dk 
+;;                   (((lambda (m) 
+;;                       (lambda (f)
+;;                         (λ (dk)
+;;                           (λ (sk)
+;;                             (λ (fk)
+;;                               (((m
+;;                                  (λ (m^)
+;;                                    (((dk ((bind m^) f))
+;;                                      sk)
+;;                                     fk)))
+;;                                 (λ (b)
+;;                                   (λ (fk)
+;;                                     ((((f b)
+;;                                        (lambda (m^)
+;;                                          (((dk m^)
+;;                                            sk)
+;;                                           fk)))
+;;                                       sk)
+;;                                      fk))))
+;;                                fk)))))) 
+;;                     (λ (dk)
+;;                       (λ (sk)
+;;                         (λ (fk)
+;;                           (fk))))) 
+;;                    (lambda (a) 
+;;                      (λ (dk)
+;;                        (λ (sk)
+;;                          (λ (fk)
+;;                            (fk)))))))
+;;                  (λ (b)
+;;                    (λ (fk)
+;;                      (fk))))
+;;                 fk) 
+;;                sk) 
+;;               fk))))))
+
+
+;; (run (letrec 
+;;          ((bind (lambda (m) 
+;;                   (lambda (f)
+;;                     (λ (dk)
+;;                       (λ (sk)
+;;                         (λ (fk)
+;;                           (((m
+;;                              (λ (m^)
+;;                                (((dk ((bind m^) f))
+;;                                  sk)
+;;                                 fk)))
+;;                             (λ (b)
+;;                               (λ (fk)
+;;                                 ((((f b)
+;;                                    (lambda (m^)
+;;                                      (((dk m^)
+;;                                        sk)
+;;                                       fk)))
+;;                                   sk)
+;;                                  fk))))
+;;                            fk))))))))
+;;        (λ (dk)
+;;          (λ (sk)
+;;            (λ (fk)
+;;              (((((dk 
+;;                   ((lambda (f)
+;;                      (λ (dk)
+;;                        (λ (sk)
+;;                          (λ (fk)
+;;                            (fk))))) 
+;;                    (lambda (a) 
+;;                      (λ (dk)
+;;                        (λ (sk)
+;;                          (λ (fk)
+;;                            (fk)))))))
+;;                  (λ (b)
+;;                    (λ (fk)
+;;                      (fk))))
+;;                 fk) 
+;;                sk) 
+;;               fk))))))
+
+;; The next two steps reveal precisely the problem. Our hypothesis was
+;; that the dk needed to receive the computation being delayed, and to
+;; also receive the present sk and fk. Which we pass along here.  We
+;; have also the sk and fk of the original computation being computed.
+
+;; The original dk was loop*, which then just took the c and made it
+;; invoke itself, which then took the sk and fk that we passed, and
+;; produce '() from it. Notice that sk and fk are still waiting to be
+;; taken in as arguments. So this is where we get the failure "Hey,
+;; '() isn't a function! You can't pass kons to it!"
+
+;; This is a wonderful example from which to start, I believe. Very
+;; neat place. If we didn't pass along the sk and fk here, but had the
+;; originals get inherited along, this example would work out
+;; correctly. But other examples did not.
+
+;; (run (λ (dk)
+;;        (λ (sk)
+;;          (λ (fk)
+;;            (((((dk 
+;;                 (λ (dk)
+;;                   (λ (sk)
+;;                     (λ (fk)
+;;                       (fk)))))
+;;                (λ (b)
+;;                  (λ (fk)
+;;                    (fk))))
+;;               fk) 
+;;              sk) 
+;;             fk)))))
+
+;; (define kons 
+;;   (λ (a)
+;;     (λ (fk)
+;;       (cons a (fk)))))
+
+;; (define nill 
+;;   (λ ()
+;;     '()))
+
+;; (define loop*
+;;   (λ (c)
+;;     (c loop*)))
+
+;; (((((loop*
+;;      (λ (dk)
+;;        (λ (sk)
+;;          (λ (fk)
+;;            (fk)))))
+;;     (λ (b)
+;;       (λ (fk)
+;;         (fk))))
+;;    nill) 
+;;   kons) 
+;;  nill)
+
+
+(define kons 
+  (λ (a)
+    (λ (fk)
+      (cons a (fk)))))
+
+(define nill 
+  (λ ()
+    '()))
+
+(define loop*
+  (λ (c)
+    (c loop*)))
+
+
+
+((((λ (fk)
+     (fk))
+   nill)
+  kons) 
+ nill)
+
+;; The solution must be different, perhaps more complex than either of
+;; those.
+
+;; What do I not know?
+
+;; * What the initial dk should be. An empty continuation?
+;; * What the other continuations should do. Which one is cpsed over
+;; the other?
+;; * What should happen when we want to delay a computation for a
+;; while?
+;; * Should we think about this in full, undelimited control? Or
+;; perhaps in terms of delimited control
+
+;; So, the new plan: meditate on what I want to happen in this
+;; situation, and see what comes to mind. I understand these tools,
+;; techniques well enough. That should get me thinking.
+
+
+;; (run (λ (dk)
+;;        (λ (sk)
+;;          (λ (fk)
+;;            (((((dk 
+;;                 (λ (dk)
+;;                   (λ (sk)
+;;                     (λ (fk)
+;;                       (fk)))))
+;;                (λ (b)
+;;                  (λ (fk)
+;;                    (fk))))
+;;               fk) 
+;;              sk) 
+;;             fk)))))
+
+;; So. What we need to do is to control the
+
+;; We could say that we control the extent of the backtracking. via delimited
+
+;; We could say that we parameterize the success and failures, so that
+;; We know what to do when we figure out the order.
+
+

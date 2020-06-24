@@ -1,5 +1,13 @@
 # mk-search-w-continuations
-Continuation-based implementation of miniKanren search
+
+## Continuation-based implementation of miniKanren search
+
+## How to visit:
+
+-  First read this README documentation.
+-  Then, read `./old-mk-cps/research-story.txt`
+-  Then, read `Church-encoding-lists-and-streams.org`
+-  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`.
 
 ## A continuation-based implementation of the miniKanren search.
 
@@ -14,7 +22,8 @@ Wadler's "... Without Even Being Odd") streams themselves are possible
 returned values. This change impacts both the datatype that we can
 possibly return, as well as the structure of the continuations.
 
- /k (one continuation) <-----> ? 
+```
+ /k (one continuation) <-----> lazy list 
   ^                            ^ 
   |                            |
   |                            |
@@ -33,6 +42,7 @@ possibly return, as well as the structure of the continuations.
   |                            |
   v                            v
 sk/fk/dk          heuristic interleaving backtracking monad(!)
+```
 
 We have an odd-looking, specialized version of the basic stream monads
 implicit in our microKanren style search. We have reason to expect
