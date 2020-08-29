@@ -8,6 +8,7 @@
 -  Then, read `./old-mk-cps/research-story.txt`
 -  Then, read `Church-encoding-lists-and-streams.org`
 -  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`.
+-  Simultaneously, read `./new-derivation/continuation-derivation-notes.org`
 
 ## A continuation-based implementation of the miniKanren search.
 
@@ -78,3 +79,8 @@ revisiting and extending makes it a bit easier still to follow some of
 the machinations in Danvy et al.
 
 We anticipate semantics directed compilation by partial evaluation. 
+
+# Directory Structure 
+
+I structured the contents of this directory as follows:
+
