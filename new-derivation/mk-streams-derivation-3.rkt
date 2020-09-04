@@ -2,9 +2,7 @@
 
 #| 
 
-There will be two tricks here.
-
-1. Install the recursive delay operator, that is the additional
+Here we install the recursive delay operator, that is the additional
 superpower endowed by this model.
 
 Unlike the others, this *does* require a macro to implement this
@@ -15,8 +13,6 @@ Notice that this define-relation does /not/ have the state embedded in
 it. None of them mention the state right now. Not sure how that worked
 or if they needed to, but for just basic stream operations, we
 needn't.
-
-2. Construct an appropriate run of these monads
 
 |#
 
