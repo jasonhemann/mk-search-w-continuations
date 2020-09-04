@@ -83,18 +83,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; This *is* almost a continuation. Tail position and all. We just
-;; lifted the lambda out to a global function I think so as to make
-;; the program easier to read. Assuming the alternate is an "mzero"ish
-;; element. 
+;; This *is* almost a continuation as we usually think about it. Tail
+;; position and all. We just lifted the lambda out to a global
+;; function I think so as to make the program easier to read. Assuming
+;; the alternate is an "mzero"ish element.
 
 (define (leqₖ i j)
   (λ (k)
    (if (<= i j) (k j) (λ (l) l))))
 
-;; Several things bear note.
-;; First this is not a lifted continuation, per se. 
-;; toₖ is itself recursive. Continuations are not recursive.
+;; Several things bear note.  First this is not a lifted continuation,
+;; per se.  toₖ is itself recursive. Continuations are usually not
+;; recursive. This is a big difference b/t Danvy and Felleisen's
+;; delimited control operators, see "Shift to Control" for details.
 
 ;; Secondly, this isn't (at least obviously) in tail form.
 ;; (k i) and ((toₖ (add1 i) j) k) both seem like serious calls.
