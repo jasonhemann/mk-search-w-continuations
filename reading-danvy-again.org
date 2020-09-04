@@ -209,6 +209,18 @@ We *do* in fact have (something like) the picture that I thought we did.
 #+END_QUOTE
 
 
+Like a burning building ... 
+
+#+BEGIN_QUOTE
+| from CList         | from CStream            |
+| λm.((m cCons) Nil) | λm.((m ??) (λ1.Nil))      |
+|                    |                         
+#+END_QUOTE
+
+There is something here interesting about ~cMore~. Because that ~xs~
+comes from effectively nowhere, we have to return something that will
+demand the ~xs~ in order to continue.
+
 
 
 
