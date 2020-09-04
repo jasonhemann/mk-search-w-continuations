@@ -1,0 +1,224 @@
+#+TITLE: Danvy Notes and Clues 
+#+LATEX_COMPILER: xelatex
+#+LATEX_HEADER: \usepackage[AUTO]{polyglossia}
+#+LATEX_HEADER: \usepackage{upquote}
+#+LATEX_HEADER: \setmonofont{DejaVuSansMono}[Scale=MatchLowercase]
+
+* Abstract 
+
+#+BEGIN_QUOTE
+For example, we derive a continuation monad as a Church encoding of
+the list monad.
+#+END_QUOTE
+
+Notice he does not say that we achieve CPS, but that instead we derive
+a continuation monad. Which, apparently, doesn't demand CPS? What does
+*a* continuation monad mean, other than it's perforce a monad. 
+
+* Semantics of a Subset of Icon
+
+Danvy side-steps issues of infinite loops and termination. His
+language is completely terminating. That's a pretty nifty trick that
+lets him side-step a whole lot of issues. [[https://dl.acm.org/doi/pdf/10.1145/1016850.1016861][Wand and Vallaincourt]] have
+something more useful to say on recursion and such.
+
+I also don't see why we needed to add the ~if_emptyM~ operation. It
+seems to me that we can macro-express that with plain old ~bind~, as
+follows:[fn:1]
+
+#+BEGIN_SRC racket
+(M a) >>= (lambda (x)
+	    (if x
+		M b
+		M b'))
+#+END_SRC
+
+The other two do matter, at the very least it'd take something to
+express them one in terms of the other, and we also have some laws
+surrounding them. But I don't know of any such laws for ~if_emptyM~.
+
+
+** 2.5  A Spectrum of Semantics
+
+#+BEGIN_QUOTE
+In an eager language such as ML, a list-based interpreter always
+computes all results. Such behavior may not be desirable in a
+situation where only the first result is of interest (or, for that
+matter, whether there exists a result): Consider for example the
+conditional, which examines whether a given expression yields at least
+one result or fails. An alternative is to use laziness.
+#+END_QUOTE
+
+Danvy also points to the conditional here, as a situation in which we
+might not *want* to compute all of these at once. This comment only
+makes sense in light of the earlier version *doing* this computation
+AOT.
+
+** 2.5 [3] A Continuation-based Interpreter
+
+So, the part that had been really getting me, if I had to crystallize
+it, was 
+
+#+BEGIN_QUOTE 
+A conceptual link between the list monad and the continuation monad
+with answer type β list → β list can be made through a Church
+encoding) of the higher-order representation of lists proposed by
+Hughes.
+#+END_QUOTE
+
+To reiterate, we're linking the list monad above with the continuation
+monad. We know the type constructor is ~(α → R) → R~, with answer type
+~R~. So we can, for instance, think of ~α → R~ as a one-hole context:
+an ~R~ with an ~α~ shaped hole in it somewhere.
+
+Here we're saying that ~R~ must be ~β list → β list~. We get the link
+by Church encoding the Hughes lists. 
+
+Skipping down to the last code of this page, the tl;dr is that we
+represent lists as "prefix functions." Rather than a data structure,
+we define a list by the behavior of prepending it to another
+list. Which is a fine thing to do! Sure! Why not!? Point being, it
+seems that the Hughes definition of a ~β list~ has type ~β list → β
+list~. Notice that for Hughes, the partially-applied ~cons x~ is
+effectively ~[x]~. This importantly means you can't ~cons x~ onto
+~cons x~ and expect to get a regular plain-ol' list back out.
+
+He says it's the /Church encoding/ of a Hughes representation that
+gets us there, though. The ~λys.~ isn't part of the Church
+encoding. That came with the Hughes lists. 
+
+I'm thinking by analogy with the Church-encoded numerals e.g,
+~λs.λz.s(sz)~. I think maybe we've encoded the Church numerals in the
+same way. Strictly speaking, nil isn't a selector function. So before
+abstracting over, this would be ~λz.add1(add1 z)~. That's a Hughes
+higher-order encoding of numbers, but not then Church encoded. The
+first-order representation, would then be ~add1 (add1 0)~, which
+actually makes sense. 
+
+Danvy points out that ~nil~ and ~cons x~ both have the same type, and
+that is ~selector-function → old-list-rep →
+old-list-rep~. (~old-list-rep~ is right now how I'm saying ~β list~
+from above). 
+
+He says that this is ~(α → β → β) → β → β~, because we're writing
+these at the most generic types possible here. We specialize it in the
+next paragraph. Danvy wrote me and said that this ~β~ isn't the same
+~β~ as in ~β list~. That any other variable name would have been
+better here b/c there's a possible confusion. The same way ~cons~
+can`t take an ~α and β list~, b/c those types don't line up, so ~α~
+and ~β~ are more general than we want. It's the same thing for ~β~
+here.
+
+How wild is it that it takes me almost a year and half a paper's worth
+of prose to read and understand someone else's paper?
+
+* 2.5 [4] 
+
+We *know* that the 1-continuation monad version is not written in
+CPS. Danvy's statement at the beginning of ~[4]~,
+
+#+BEGIN_QUOTE
+A tail-recursive implementation of a continuation-based interpreter
+for Icon uses explicit success and failure continuations.
+#+END_QUOTE
+
+only makes sense in the context of the 1-continuation version being
+*not* tail recursive. We have read this correctly; it's deliberate. 
+
+I think, further, that ~C₂~ has the subscripted ~2~ not because it's
+the second version of a continuation-based semantics, but simply
+because those places use two continuations. This would explain why we
+see ~C₂~ in Figure 5: Here, we really do have and make use of two
+continuations. This conditional/choice operation here is the only
+place in the Figure 5 interpreter (as it is presently written) that we
+see the second continuation, or the list argument, explicitly
+exposed. We do see it show up in the return values of those help
+functions, and we do see it buried in the non-tail composition
+operator. But that ~ifte~ operation is the only place that we have to
+expose, explicitly, the ~λl.~—because we need to duplicate it in the
+body.
+
+I don't have it *quite* yet, but compare the below. Bear in mind that
+the variable names here kinda collide; he'd've much improved the whole
+thing by using fresh meta-variable names throughout.
+
+#+BEGIN_EXAMPLE
+ (α →     R)       →      R         ;; This he says 2.5 [3] is the definition of the type constructor.
+ (i → (1 → α) → α) → (1 → α) → α    ;; In fig 6's page, pgh 3 he's saying the R is (1 → α) → α
+ (i →    β    → β) →    β    → β    ;; Before, R was β → β, for any β (e.g. γ list) 
+#+END_EXAMPLE
+
+Figures 5 and 6 both show definitions of monadic interpreters where
+monad operations are in-lined and the expressions ~β~-reduced. The ~C~
+and ~C₂~ versions both beta reduce away the "inner continuation"
+parts, because they don't do any choosing or accumulating; they just
+evaluate the pieces and then pass them off. Which is to say, the RHSs
+of the other ones look the same *because* we pulled out those two
+"help functions", and they didn't do anything. 
+
+It still bears discussing/thinking how ~λl.l~ transforms into
+~f()~. But this is getting closer. How's that? 
+
+We know that, given the interpreter in Figure 5, we'd have to CPS ([[https://pdfs.semanticscholar.org/a9f0/aa4118e29f94d904a21810f83499ae13a98f.pdf][à
+la Fischer]]) the RHS to get it in a tail-recursive form. True. And we
+do that in the move from Figure 5 to Figure 6.
+
+The two-continuation version *is* a built of a meta continuation and
+an OG continuation. So, we *do* have something of a quadrant here,
+comparing list and stream, and C and C₂. I don't know about directly
+comparing the lists and streams. (Yet!)
+
+Here's the money quote, though, I think.
+
+#+BEGIN_EXAMPLE
+Just as the continuation monad from Fig. 4 can be conceptually linked to the
+list monad, the present continuation monad can be linked to the stream monad
+by a Church encoding of the data type of streams:
+#+END_EXAMPLE
+
+We *do* in fact have (something like) the picture that I thought we
+did.
+
+ 
+ | Peano numbers            | --HO-encode-the-zero-element--->  | HO "sum-with", "FO num -> FO num", encoding  | --Church-encode-(the lone constructor `add`)--------> | Church numerals |                                | |
+ | FO list data structure   | ------Hughes-encode-lists-------> | HO "prefix-by" "FO List -> FO List" encoding | --Church-encode-(the lone constructor `cons`)-------> | Church lists    | ~same-type-as-specialized-κ~   | | 
+ |                          |                                   |                                              |                                                       |                 |                                | | 
+ | FO Stream data structure | ----HO-encode-`end`-constructor-> | mixed, weird stream encoding                 | --Church-encode-(the remaining constructor `more`)--> | Church streams  | ~same-type-as-specialized-κ₂~~ | |
+ |                          |                                   |                                              |                                                       |                 |                                | |
+
+ | FO Stream data structure | --------------------------------------------------Church-encode-(both constructors simultaneously)------------------------------------—> | Church streams | ~~~ |
+
+
+
+ |                  | Eager             |                           | Lazy              |
+ | Defunctionalized | List              | -thunk-the-cdrs->         | Stream            |
+ |                  | 1                 |                           | 1                 |
+ |                  | (re)functionalize |                           | (re)functionalize |
+ |                  | 1                 |                           | 1                 |
+ |                  | v                 |                           | v                 |
+ | Functionalized   | λl.l              | -invoke-b/c-now-thunked-> | λl.l()            |
+ |                  | 1                 |                           | 1                 |
+ |                  | CPS               |                           | CPS               |
+ |                  | 1                 |                           | 1                 |
+ |                  | v                 |                           | v                 |
+ | Church Encoded   | C₁                | -CPS->                    | C₂                |
+
+
+#+BEGIN_SRC racket
+
+
+
+#+END_SRC
+
+
+
+* Footnotes
+
+[fn:1] See though, the remark we highlight in 2.5. This seems to
+suggest that he *intends*, especially, for all three pieces to
+evaluate eagerly, and then we select over it. The way the naive,
+malformed CPS transform of an if would evaluate all three pieces and
+then choose. 
+
+
+

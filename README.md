@@ -7,8 +7,9 @@
 -  First read this README documentation.
 -  Then, read `./old-mk-cps/research-story.txt`
 -  Then, read `Church-encoding-lists-and-streams.org`
--  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`.
--  Simultaneously, read `./new-derivation/continuation-derivation-notes.org`
+-  Then, read `./reading-danvy-again.org`
+-  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`, and simultaneously with these
+-  Read `./new-derivation/continuation-derivation-notes.org`
 
 ## A continuation-based implementation of the miniKanren search.
 
@@ -24,7 +25,7 @@ returned values. This change impacts both the datatype that we can
 possibly return, as well as the structure of the continuations.
 
 ```
- /k (one continuation) <-----> lazy list 
+ /k (one continuation) <-----> list (c.f. Danvy, "Unifying ...")
   ^                            ^ 
   |                            |
   |                            |
@@ -33,7 +34,7 @@ possibly return, as well as the structure of the continuations.
   |                            |
   |                            |
   v                            v
- sk/fk <---------------> backtracking monad
+ sk/fk <---------------> lazy list (streams) (c.f. Danvy, "Unifying ...")
   ^                            ^ 
   |                            |
   |                            |
@@ -42,7 +43,7 @@ possibly return, as well as the structure of the continuations.
   |                            |
   |                            |
   v                            v
-sk/fk/dk          heuristic interleaving backtracking monad(!)
+sk/fk/dk <---??---> heuristic interleaving backtracking monad(!) (c.f. Danvy, "Unifying ...")
 ```
 
 We have an odd-looking, specialized version of the basic stream monads
