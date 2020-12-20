@@ -90,10 +90,10 @@ encoding. That came with the Hughes lists.
 I'm thinking by analogy with the Church-encoded numerals e.g,
 ~λs.λz.s(sz)~. I think maybe we've encoded the Church numerals in the
 same way. Strictly speaking, nil isn't a selector function. So before
-abstracting over, this would be ~λz.add1(add1 z)~. That's a Hughes
-higher-order encoding of numbers, but not then Church encoded. The
-first-order representation, would then be ~add1 (add1 0)~, which
-actually makes sense. 
+abstracting over, this would be ~λz.add1(add1 z)~. That's a
+Hughes-style higher-order encoding of numerals, but not then Church
+encoded. The first-order representation, would then be ~add1 (add1
+0)~, which actually makes sense.
 
 Danvy points out that ~nil~ and ~cons x~ both have the same type, and
 that is ~selector-function → old-list-rep →
@@ -179,6 +179,19 @@ by a Church encoding of the data type of streams:
 
 We *do* in fact have (something like) the picture that I thought we did.
 
+I do not understand below how we move from END to lambda e.e(). End
+looks the same as Nil, a nullary constructor. Since Nil is \l.l, and
+it's a uniform transformation over datatypes, why isn't End \e.e? Cons
+and More don't line up, we have the explicit delay in the cdr of
+More. So the disparity between those two makes some sense. Esp when we
+recognized the connection between More and NonIn
+
+To consider: maybe if I think of the streams like codata. 
+
+
+
+
+
 #+BEGIN_QUOTE
 | τ List                                                                 | ≡                                       | Nil                                             | Cons of (τ × τ List)                            | \= | thunk datatype's cdrs | ⇒ | τ Stream                                                                                           | ≡                                       | End                                             | More of (τ × (1 → τ Stream))                    |
 |                                                                        | abstract over tail                      |                                                 | new type, new constructors                      |    |                       |   | (NB: Hughes streams come in thunkd)                                                                | abstract over thunked tail              |                                                 | new types, new constructors                     |
@@ -189,7 +202,7 @@ We *do* in fact have (something like) the picture that I thought we did.
 | τ CList =_df (τ → τ HList) → τ HList                                   | ≡                                       | Nul \= λsc.λl.l : τ CList                       | Qons x \= λsc.λl.(sc x) l : τ CList             | \= |                       | ⇒ | τ CStream =_df (τ → τ HStream)  → τ HStream                                                        | ≡                                       | Ind \= λsm.λe.e() : τ CStream                   | Just x \= λsm.λe.(sm x) e : τ CStream           |
 |                                                                        |                                         |                                                 | where Qons : τ → τ CList                        |    |                       |   |                                                                                                    |                                         |                                                 | And Just : τ → τ CStream                        |
 |                                                                        |                                         |                                                 |                                                 |    |                       |   |                                                                                                    |                                         |                                                 | However, also we could equally well construct   |
-|                                                                        |                                         | Unchanged from above                            | NonIn x xs \= λsc.λl.(sc x) xs : τ CList             |    |                       |   |                                                                                                    |                                         | Unchanged from above                            | Mower x xs \= λsm.λe(sm x) xs : τ CStream       |
+|                                                                        |                                         | Unchanged from above                            | NonIn x xs \= λsc.λl.(sc x) xs : τ CList        |    |                       |   |                                                                                                    |                                         | Unchanged from above                            | Mower x xs \= λsm.λe(sm x) xs : τ CStream       |
 |                                                                        |                                         |                                                 | Unchanged from above                            |    |                       |   |                                                                                                    |                                         |                                                 | And Mower \= τ → (τ → τ CStream) → τ CStream    |
 |                                                                        | α  equivalent to                        |                                                 |                                                 |    |                       |   |                                                                                                    | α equivalent to                         |                                                 |                                                 |
 |                                                                        | ≡                                       | Nul \=  λk.λl.l : τ CList                       | Qons x \= λk.λl.((k x) l)  : τ CList            | \= |                       | ⇒ |                                                                                                    | ≡                                       | Ind \= λk.λf.f() : τ CStream                    | Mower x xs \= λk.λf.(k x) xs : τ CStream        |
@@ -212,14 +225,181 @@ We *do* in fact have (something like) the picture that I thought we did.
 Like a burning building ... 
 
 #+BEGIN_QUOTE
-| from CList         | from CStream            |
-| λm.(trace ((m cCons) Nil)) | λm.((m ??) (λ1.Nil))      |
-|                    |                         
+| from CList           | from CStream           |
+| λm.(((m cCons) Nil)) | λm.((m Just) (λ1.Nil)) |
+|                      |                        |
 #+END_QUOTE
 
 There is something here interesting about ~cMore~. Because that ~xs~
 comes from effectively nowhere, we have to return something that will
 demand the ~xs~ in order to continue.
+
+* Our Version 
+
+What's difficult about this version is that we have this ~delay~
+operator. That's the trouble. The datatype doesn't *start* lazy, it's
+constructed from a computation that *produces* a DList.
+
+This feels monadic. The constructor takes in a computation. And what
+do we mean by a computation? We mean a function from <something?> that
+produces a ~lazy~ DList. 
+
+The Delay constructor itself isn't lazy. The delay constructor eagerly
+consumes the computation. That's fine. It's that there's something
+lazy about what that computation _produces_. So, what is it that such
+a computation produces, and does that mean that the datatype of the
+computation is now mutually dependent upon the type of the DList?
+
+So then, what is a computation C? ~τ~ are the types of the elements of
+the streams. These were numbers for Danvy. For us, ~τ~s are states.
+
+We don't need to care that we are using these computations for logic
+programming relations. What do we care about? Could it be just that
+the constructor itself takes in the Delayed stream? Could that be
+sufficient? And we don't care, for the purposes of this dotatype and
+constructor, how it got that way? So, that is, Delay of 
+
+The computation for us *actually* is the
+arguments to the relation. What *must* those be?
+
+One might think of these as a function from a computation that
+produces a stream of taus to a () -> List Taus. I don't know how to
+think about that stuff.
+
+#+BEGIN_QUOTE
+| C : C τ → (1 → τ Stream) |
+#+END_QUOTE
+
+However, that expression just evaluates to a stream of some kind. I
+don't know if the fact of how the code creates the stream matters.
+
+I'm re-reading the "... Without Even Being Odd" paper, to remind
+myself of how this related in with our stream definitions. This was
+getting temporarily confusing. I think that I can start off from
+either the Even style with difficulty or the Odd style with
+difficulty, and try and get to one or the other. The implementations
+in this paper offer a map operator (bind), an infinite stream
+generator (useful), and the DTs themselves.
+
+Our relations look like their countdown from the even style
+w/difficulty.
+
+| () -> DT a | Delay DT a | 
+
+#+BEGIN_QUOTE
+| DT a | :     | Nil | End                    | Cons a DT a                  | More/arg a (() -> DT a)          | Delay |
+|      |       |     | λl.l()                 | λl.cons a l                  | λl.more a l                      |       |
+|      |       |     | λl.l()                 | λl.(cons a) l                | λl.(more a) l                    |       |
+| must | fix   |     | an                     | order                        | all                              |       |
+|      |       |     | λc.λm2.λl.l()          | λc.λm2.λl.(c a) l            | λc.λm2.λl.(m2 a) l               |       |
+| now  | we    |     | will                   | create                       | each                             |       |
+|      |       |     | End = λc.λm2.λl.l()    | Cons a = λc.λm2.λl.(c a) l   | More2 a xs = λc.λm2.λl.(m2 a) xs |       |
+| The  | above |     | might be wrong becaues | we might need an  on the END | This xs must be a thunk?         |       |
+|      |       |     |                        |                              |                                  |       |
+#+END_QUOTE
+
+
+
+#+BEGIN_QUOTE
+| τ DList                                    | ≡ | Nil               | Cons of (τ × τ DList)           | Delay of (1 → τ DList)         |                                                               |
+| Change representing a sometimes thunkd cdr |   |                   |                                 |                                |                                                               |
+| τ DStream                                  | ≡ | End               | Cons of (τ × τ DStream())       | Delay of τ DStream             | Don't know about this representation of what's going on       |
+| τ HDStream =_df τ DStream → τ DStream      |   | λl.l() : τ HDList | λl.Kons of (τ x l()) : τ HDList | λe.Dilay of τ DList : τ HDList | I think somehow we say that invoking a DStream gets a DStream |
+|                                            |   |                   |                                 |                                |                                                               |
+|                                            |   |                   |                                 |                                |                                                               |
+#+END_QUOTE
+
+
+** Mitch and I find a bug in Danvy in that ifEmptyC takes the xs and ys arguments in the wrong order.
+
+** We also discover a notational bug, that only if one reads the C2 expressions as uncurried are they in tail-form. Otherwise, they aren't
+
+Based on that we discover how, precisely, the thunking of the cdrs of the datatypes takes a non-tail form expression to tail form: b/c the thunk delays the evaluation of a nested computation. 
+
+So. What we've discovered, I think, is that the problem is the
+following: we must take this "thunking the cdrs", a meta-operation
+over the datatypes transforming a DT from one to another, and now make
+it /internal/ /to/ the DT itself.
+
+Then oughtn't we be able to reach what we're after as a result of sk/fk transformation over the CBV encoding of the delay terms? 
+
+This might argue for building force and delay as components of the
+easy language, and run of the delay monad, and then trying to build
+this operation on top of /that/? Stacked /that/ way?
+
+#+BEGIN_SRC racket
+(define (valof-cps e env-cps k)
+  (match e
+    ;;  ...
+    [`(delay ,e1) (lambda (k) (valof-cps env-cps k))]
+    [`(force ,d-exp) (valof-cps d-exp env-cps (lambda (del) (del k)))]
+    [`(lambda (,x) ,body)
+     (lambda (a k)
+       (valof-cps body
+                  (lambda (y k^)
+                    (if (eqv? x y)
+                        (k^ a)
+                        (env-cps y k^)))
+                  k))] 
+    [`(,rator ,rand)
+     (valof-cps rator env-cps
+                (lambda (p-cps)
+                  (valof-cps rand env-cps
+                             (lambda (a)
+                               (p-cps a k)))))]))
+#+END_SRC
+
+But it might also well be that we /can't/ simply define the lambdas themselves with datatypes, and that's probably so. 
+
+http://blog.ielliott.io/lambdas-are-codatatypes/
+
+Maybe I have to do something with them, or think about it that way.
+
+We'll build our (here, below "a"s) with the λ encoding, and we'll know
+something about how that's constructed, that will guarantee to *allow*
+us to build a delay operation. Pass along the parameters to an
+underlying lambda. Go from there. 
+
+CPS a la Fischer or CPS a la Plotkin?
+
+#+BEGIN_QUOTE
+| DT a | :                                     | Nil                  | Cons a DT a                  | More a DT a                        | Delay DT a             |                                                |
+|      |                                       | λk.λl.k l            | λk.λl.k (cons a l)           |                                    | λk.λl.k (λk. (l k))    |                                                |
+|      | or to reorder the ks                  | λl.λk.k l            | λl.λk.k (cons a l)           |                                    | λl.λk.k (λk. (l k))    |                                                |
+|      | do we need that eta, or can we reduce |                      |                              |                                    | λl.λk.k l              | we must not need the eta, since we pass as arg |
+|      | so how do you CSP the delay part      | Nil := λsk.λl.λk.k l | Cons x := λsk.λl.λk.(sc x l) | More x xs := λsk.λl.λk.((sk x) xs) | Delay := λsk.λl.λk.k l |                                                |
+|      | This is like our operator             |                      |                              |                                    |                        |                                                |
+|      | which means l must be...?             |                      |                              |                                    |                        |                                                |
+#+END_QUOTE
+
+The thing is, we have to be producing Delaying a DT a. That's what it has to be a delay *of*. 
+So whatever we get when we invoke the delay (with Run, that is) must itself be a DT. 
+
+It might be we just return the underlying delayed operation. 
+It might be we return a bundle of the success and failure computations back up? 
+
+| from CList           |   |
+| λm.(((m cCons) Nil)) |   |
+|                      |   |
+
+And this has to be it. ~f (Y f) = (Y f)~
+
+#+BEGIN_QUOTE
+(run 1 (q) (foo q))
+
+(define-relation (foo q) 
+  (disj (== 'a q) (foo q)))
+#+END_QUOTE
+
+<Delay>
+Δ (foo q)
+
+Delay Shift Reset
+
+<Δ (foo q), iSK, iFK>
+
+
+
 
 
 
