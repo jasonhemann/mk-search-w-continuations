@@ -1,0 +1,266 @@
+\documentclass[screen,anonymous,review,natbib=false]{acmart} %% draft
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont{} B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+\acmDOI{...} % DOI - Insert your DOI below...
+\acmISBN{...} % ISBN - Insert your conference/workshop's ISBN below...
+\acmPrice{15.00}
+\acmConference[Short Name]{Long Name}{dates}{venue}
+\setcopyright{acmcopyright}
+\copyrightyear{2020}
+\acmYear{2020}
+\acmDOI{}
+
+\PassOptionsToPackage{final}{microtype}
+\PassOptionsToPackage{usenames,dvipsnames,svgnames,table,x11names}{xcolor}
+\PassOptionsToPackage{cache=false}{minted}
+\usepackage{fix-cm}
+\usepackage{graphicx, color} 
+\usepackage{fontspec,newunicodechar}
+\usepackage{graphbox} %% an extension of graphix, for \includegraphics 
+\usepackage{hyphenat} %% electromagnetic\hyp{}endioscopy
+\usepackage[shortcuts]{extdash}
+\usepackage{polyglossia} %% for xelatex use polyglossia
+\setdefaultlanguage[variant=american]{english}
+%% \usepackage{alltt} %% Commented in favor of fancyvrb, which minted loads
+\usepackage{chngcntr} %% for changing counters in fixing the way sections, etc print.
+\usepackage{hang} %% to include hanging indent packages, AFAIK better than {hanging}
+\defaultfontfeatures{Ligatures=TeX,Mapping=tex-text}
+% Needed for the bibliography commands
+% ^Needed to build bib entries in text, outside bibliography
+%% \usepackage{pdftexcmds} %% useful for LuaTex, not needed here
+%% \usepackage{bibentry} %% For inserting full bib citations into the document. not needed w/biblatex
+\usepackage{mathtools} %% loads amsmath w/improvements, which needs to be before hyperref
+%% \usepackage{mathspec} -- causes a clash; subsumes fonstpec, must come after amsmath
+\usepackage{latexsym} %% additional symbols
+%%\usepackage[warnings-off={mathtools-colon}]{unicode-math} -- can't be added, b/c it overwrites \eth
+% \usepackage{amssymb}  %% -- can't be added, b/c it overwrites \Bbbk 
+\usepackage{wasysym}  %% additional symbols
+\usepackage{bold-extra} %% \textsc{ \textbf{This is bold small capitals} }
+\usepackage{tabu} %% the currently-preferred table package
+%% But! See: https://tex.stackexchange.com/questions/121841/is-the-tabu-package-obsolete
+\usepackage{pdflscape} %% for \begin{landscape} ..., to change part of doc to landscape
+%% \usepackage{multicol} %% provides multicol environment
+\usepackage{morefloats} %% raise limit for max # floats above 18
+\usepackage{placeins} %% gives \FloatBarrier, which limits float movements [section]
+\usepackage{needspace} %% prevents page breaks right after section names
+\usepackage{wrapfig} %% adds \begin{wrapfigure}[lh]{pos}[ohang]{w}
+% \usepackage{floatrow} %% improved version of sidecap, for horizontal caption placement
+\usepackage{etaremune} %% rev enumerate. obv :D
+\usepackage{mathrsfs}
+\usepackage{calrsfs}
+\usepackage{layout}
+%\usepackage{showframe} Turn on to see the frame around the stuff 
+\usepackage{mathalfa} %% https://tex.stackexchange.com/questions/58098/what-are-all-the-font-styles-i-can-use-in-math-mode/58124#58124
+\usepackage{bbold}
+%% eufrak package is redundant b/c amsmath
+\usepackage{bigintcalc}
+\usepackage{ifdraft}
+\usepackage{zref}
+\usepackage{classlist}
+\usepackage{dsfont}
+\usepackage{subcaption} %% allows subcaptions before captions 
+\usepackage[bottom]{footmisc} %% for customizing footnotes
+%\usepackage{varioref} %% adds \vref, w/context sensitivity referencing
+\usepackage[all]{hypcap} %% resolves issues w/captions & hyperref. Load after hyperref
+\usepackage[capitalize,nameinlink]{cleveref} %% adds \crefrange{}{} and \cpagerefrange{}
+\RequirePackage[backend=biber,%
+                abbreviate=true,%
+                dateabbrev=true,%
+                isbn=true,%
+                doi=true,%
+                urldate=comp,%
+                url=true,%
+                maxcitenames=2,%
+                maxbibnames=4,%
+                backref=false,%
+                style=ACM-Reference-Format,%
+                natbib=true,
+                autocite=plain,%
+                block=space,%
+                alldates=terse,%
+                isbn=false,%
+                defernumbers=true,%
+                sortcites=true,%
+                sortsets=true,%
+                eprint=false,%
+                language=american]{biblatex}
+\usepackage{nag} %% should complain about old and outdated commands
+\usepackage{mdframed} %% adds \begin{framed} environment, and other simple framing boxes
+\usepackage{fancybox} %% adds \doublebox, \ovalbox, and \shadowbox 
+%% must load fancybox before minted
+\usepackage{xpatch} %% for etoolbox w/biblatex
+\usepackage{minted} %% My brand new baby for highlighting source code
+%% also adds \begin{framed} environment
+\usepackage{mathpartir} %% Didier Remy's typesetting for proofs. 
+\usepackage[strict,autostyle]{csquotes} %% enquote &c that doesn't interfere w/cdlatex usage http://ftp.lyx.org/pub/tex-archive/macros/latex/contrib/csquotes/csquotes.pdf
+\usepackage[xspace]{ellipsis} %% http://tex.stackexchange.com/questions/73467/what-is-best-method-to-insert-an-ellipsis-in-a-xetex-document#73469
+\usepackage{pseudocode}
+\usepackage{epigraph}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{tikz-cd}
+\usepackage{algorithm} %% must come after floatrow [chapter] 
+\usepackage[defaultlines=3,all]{nowidow} %% Eliminates widow and orphans 
+\addbibresource{streams.bib}
+
+\setmonofont{DejaVuSansMono}[Scale=MatchLowercase] %% What is this scale option?
+\tracinglostchars=2
+
+\newmintinline[rackinline]{racket}{}
+\newmintinline{prolog}{}
+
+%% defines posscite, \posscites, \Posscites
+%% From https://tex.stackexchange.com/a/307461/109698
+\DeclareNameFormat{labelname:poss}{% Based on labelname from biblatex.def
+  \nameparts{#1}% Not needed if using Biblatex 3.4
+  \ifcase\value{uniquename}%
+    \usebibmacro{name:family}{\namepartfamily}{\namepartgiven}{\namepartprefix}{\namepartsuffix}%
+  \or%
+    \ifuseprefix%
+      {\usebibmacro{name:first-last}{\namepartfamily}{\namepartgiveni}{\namepartprefix}{\namepartsuffixi}}
+      {\usebibmacro{name:first-last}{\namepartfamily}{\namepartgiveni}{\namepartprefixi}{\namepartsuffixi}}%
+  \or%
+    \usebibmacro{name:first-last}{\namepartfamily}{\namepartgiven}{\namepartprefix}{\namepartsuffix}%
+  \fi
+  \usebibmacro{name:andothers}%
+  \ifnumequal{\value{listcount}}{\value{liststop}}{'s}{}}
+\DeclareFieldFormat{shorthand:poss}{%
+  \ifnameundef{labelname}{#1's}{#1}}
+\DeclareFieldFormat{citetitle:poss}{\mkbibemph{#1}'s}
+\DeclareFieldFormat{label:poss}{#1's}
+\newrobustcmd*{\posscitealias}{%
+  \AtNextCite{%
+    \DeclareNameAlias{labelname}{labelname:poss}%
+    \DeclareFieldAlias{shorthand}{shorthand:poss}%
+    \DeclareFieldAlias{citetitle}{citetitle:poss}%
+    \DeclareFieldAlias{label}{label:poss}}}
+\newrobustcmd*{\citeposs}{%
+  \posscitealias%
+  \textcite}
+\newrobustcmd*{\Citeposs}{\bibsentence\citeposs}
+\newrobustcmd*{\Citeposses}{%
+  \posscitealias%
+  \textcites}
+
+\newcommand{\meta}[2]{[\textsc{#1}: \emph{#2}]}
+\newcommand{\todo}[1]{\textcolor{red}{\meta{TODO}{#1}}}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+\title{The Cost of Occurs-check in Relational Program Synthesis}
+%\title{Improved Performance of Relational Synthesis through Eliminating Occurs Checks}
+%\title{The Impact of Unification Algorithms in Relational Synthesis Applications} 
+%\title{An Optimizing miniKanren for more Performant Relational Synthesis}
+
+\author{Us}
+\email{void@example.com}
+\orcid{1234-5678-9012}
+\affiliation{%
+  \institution{Northeastern University}}
+
+
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+% \renewcommand{\shortauthors}{}
+
+\begin{abstract}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10003752.10003790.10003795</concept_id>
+       <concept_desc>Theory of computation~Constraint and logic programming</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Theory of computation~Constraint and logic programming}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{relational, program synthesis, unification, miniKanren, logic programming}
+
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+\section{Background}\label{sec:background}
+
+
+\todo{What about that linear one designed to be more efficient in
+  practice? Add that one in here.}
+
+\section{Theory}\label{sec:theory}
+
+\begin{listing}
+\begin{minted}[autogobble,stripall,linenos]{racket}  
+(define welcome
+  (λ (x)
+    (printf "hello ~s~n" x)))
+\end{minted}
+\caption{The \rackinline|welcome| method says hello to the argument.}
+\label{mnt:welcome}
+\end{listing}
+
+\section{Performance}\label{sec:performance}
+
+\begin{verbatim}
+In generating 4 thrines (fresh), we had the following
+succeed-ct: 216376
+clash-ct: 97712
+cycle-ct: 6892
+\end{verbatim}
+
+
+The numbers for the more complicated queries from
+\citet{byrd2017unifiedapproach} are also interesting to see.
+
+It would be interesting to know the ``run lengths'' of these successes
+and either kind of failure as we compute, either in between
+interleaves or in each interleave. For the \citet{byrd2017unifiedapproach}
+final interpreter example. It seems that in practice on many examples
+\citeposs{robinson1965machine} version out-performs the
+asymptotically-superior algorithms.
+
+\href{file://~/Downloads/icfp-17/shared/}{file://~/Downloads/icfp-17/shared/}
+\todo{Run these same performance comparisons against the Nada quines problem from TLS, without using any constraints but ==.}
+
+\section{Related}\label{sec:related}
+
+
+\section{Conclusions}\label{sec:conclusions}
+
+%%
+%% The acknowledgments section is defined using the "acks" environment
+%% (and NOT an unnumbered section). This ensures the proper
+%% identification of the section in the article metadata, and the
+%% consistent spelling of the heading.
+
+% \begin{acks}
+%   We thank you all. 
+% \end{acks}
+
+\printbibliography{}
+
+\end{document}
+\endinput
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
