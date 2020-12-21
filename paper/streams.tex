@@ -17,6 +17,7 @@
 \PassOptionsToPackage{final}{microtype}
 \PassOptionsToPackage{usenames,dvipsnames,svgnames,table,x11names}{xcolor}
 \PassOptionsToPackage{cache=false}{minted}
+\usepackage{attrib}
 \usepackage{fix-cm}
 \usepackage{graphicx, color} 
 \usepackage{fontspec,newunicodechar}
@@ -152,7 +153,10 @@
 %%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
-\title{Even Odder Streams}
+\title{Eager Backtracking, Less Interleaving with Even More Odd Streams}
+% \title{Consolidating Approaches to Eager Backtracking}
+% \title{Less Backtracking in Eager Languages with Even Odder Streams
+%   and Delimited Control}
 
 \author{Us}
 \email{void@example.com}
@@ -194,59 +198,177 @@
 %% information and builds the first part of the formatted document.
 \maketitle
 
+
+% \setlength\epigraphwidth{.5\textwidth}
+
+% \epigraph{Flowing streams in all your windings stray,}
+% {Eliza and Sarah G Wolcott, \emph{The Meeting of the Waters}}
+
 \section{Introduction}\label{sec:intro}
+
+In \citetitle{danvy2002unifying}, \citeauthor{danvy2002unifying}
+connect through monadic interpreters four different implementations of
+backtracking, namely: list-based, stream-based, and one- and
+two-continuation based implementations. Inter alia, they make the
+following observation:
+%
+\begin{quote}
+  Just as the continuation monad from Fig. 4 can be conceptually
+  linked to the list monad, the present continuation monad can be
+  linked to the stream monad by a Church encoding of the data type of
+  streams
+\end{quote}
+%
+The authors do not dwell long on their observation. They remark on the
+novelty of this point and proceed to use the fact of this relationship
+to guide their compilation of goal-oriented languages. But
+\citeauthor{danvy2002unifying} perhaps give themselves too little
+credit; the interrelationships they observe are less straightforward
+than they might first appear to the casual reader. These additional
+subtleties become more obvious when we extend the relationship to link
+in an eager language a stream datatype with eager and lazy
+constructors to its continuation-based variant. These complexities
+appear more obvious still when we add interleaving.
+
+\begin{listing}
+\begin{minted}[autogobble,stripall,linenos]{ml}
+datatype 'a list   = Nil | Cons of 'a * 'a list
+datatype 'a stream = End | More of 'a * (1 -> 'a stream)
+\end{minted}
+\caption{Datatypes for eager lists and odd streams}
+\label{mnt:eager-lazy-datatypes}
+\end{listing}
+
+The \mintinline{ml}|stream| datatype we define in
+\cref{mnt:eager-lazy-datatypes}, unlike the \mintinline{ml}|list| datatype,
+demands a thunk as the second argument to the \mintinline{ml}|More|
+constructor, to delay evaluation. We could have instead appealed to
+lazy constructors (e.g. \mintinline{ml}|lazy|) or retreated to a lazy
+host language. Those alternative choices, however, bury the
+relationship we want to further explore.
+
+The streams of \cref{mnt:eager-lazy-datatypes} are
+odd. \citeauthor{wadler1998add}, in \citetitle{wadler1998add},
+classify implementations of lazy stream datatypes in an eager host
+language as either \enquote{even} or \enquote{odd}. Those names
+reflect both the number of \rackinline|cons|es in the streams they
+construct (an even or odd number respectively) and also the
+peculiarity of the latter: the odd-style of forces just a bit too much
+evaluation leading sometimes to subtle bugs. Using these same
+constructs, though, \citeauthor{wadler1998add} show how to construct
+an even kind of stream. We reproduce this definition in
+\cref{mnt:even-streams-with-difficulty}\footnote{This is in fact a
+  modified version of \citeposs{wadler1998add} definition; their
+  original version introduces a construct that adds not just
+  non-strict evaluation but also memoization.}.
+  
+\begin{listing}
+\begin{minted}[autogobble,stripall,linenos]{ml}
+datatype 'a stream_ = End_ | More_ of 'a * 'a stream
+withtype 'a stream  = (1 -> 'a stream_)
+\end{minted}
+\caption{\citeposs{wadler1998add} datatype for even streams with difficulty}
+\label{mnt:even-streams-with-difficulty}
+\end{listing}
+
+We consider streams an even more peculiar flavor. Unlike either
+\citeauthor{wadler1998add,danvy2002unifying}, we construct streams
+without a simple, fixed, regular structure to their
+\rackinline|delay|s. Furthermore, we must take more caution as we
+construct these streams in our eager host language. For the price of
+these drawbacks, however, we take several benefits. If we know that we
+will never re-use the values of these computations, then any
+memoization wastes resources. This situation is not contrived: the
+Racket language~\cite{flatt2010reference} has a built-in construct
+\rackinline|delay/name| just for such situations. Unlike other
+definitions of streams, we can place \rackinline|delay|s precisely
+where they are necessary, and nowhere else. Further, since delays are
+now optional instead of mandatory, the delays can then double also as
+markers for the positions in which to interleave when combining two
+streams.
+
+\begin{listing}
+\begin{minted}[autogobble,stripall,linenos]{ml}
+datatype 'a stream__ = Nil__ | Cons__ of 'a * 'a stream__ | (1 -> 'a stream__)
+\end{minted}
+\caption{Even more odd streams}
+\label{mnt:even-more-odd}
+\end{listing}
+
+We can see the streams of \cref{mnt:even-more-odd} as a mixture of
+both the even and odd styles of defining streams. Unlike either of
+\citeposs{wadler1998add}, the delayed evaluation is not subsidiary to
+a part of a union type, but a member of the union itself. This means
+that unlike \citeposs{danvy2002unifying} and
+\citeauthor{wadler1998add} odd streams, delayed computations are
+themselves possible values of the datatype. Unlike
+\citeauthor{wadler1998add} even streams though, pairs of values are
+still themselves members of the datatype. This change impacts both the
+datatype that we can possibly return, as well as the structure of
+their corresponding continuation-based implementation.
+
+If the lists of \cref{mnt:eager-lazy-datatypes} correspond to a
+single-continuation implementation of backtracking, and the streams of
+\cref{mnt:eager-lazy-datatypes} correspond to the two-continuation
+implementation of backtracking, then to what sort of continuation
+based implementation of backtracking should our streams in
+\cref{mnt:even-more-odd} correspond? 
 
 \section{Background}\label{sec:background}
 
 
-\todo{What about that linear one designed to be more efficient in
-  practice? Add that one in here.}
+% Wadler even odd. Even *odder* streams.
 
-\section{Theory}\label{sec:theory}
+% Their connection via Danvy to the multi continuation delimited control
+% operations
 
-\begin{listing}
-\begin{minted}[autogobble,stripall,linenos]{racket}  
-(define welcome
-  (λ (x)
-    (printf "hello ~s~n" x)))
-\end{minted}
-\caption{The \rackinline|welcome| method says hello to the argument.}
-\label{mnt:welcome}
-\end{listing}
+% Those connections to the ``Backtracking, interleaving'' paper
 
-\section{Performance}\label{sec:performance}
+% Minimal amounts of interleaving that you'd require.
 
-\begin{verbatim}
-In generating 4 thrines (fresh), we had the following
-succeed-ct: 216376
-clash-ct: 97712
-cycle-ct: 6892
-\end{verbatim}
+% Unfolding to get there, via connection w/miniKanren streams. 
+
+% History of the multi-continuation implementation of LP.
 
 
-The numbers for the more complicated queries from
-\citet{byrd2017unifiedapproach} are also interesting to see.
+% \todo{What about that linear one designed to be more efficient in
+%   practice? Add that one in here.}
 
-It would be interesting to know the ``run lengths'' of these successes
-and either kind of failure as we compute, either in between
-interleaves or in each interleave. For the \citet{byrd2017unifiedapproach}
-final interpreter example. It seems that in practice on many examples
-\citeposs{robinson1965machine} version out-performs the
-asymptotically-superior algorithms.
+% \section{Theory}\label{sec:theory}
 
-\href{file://~/Downloads/icfp-17/shared/}{file://~/Downloads/icfp-17/shared/}
-\todo{Run}
+% \section{Performance}\label{sec:performance}
 
-\section{Related}\label{sec:related}
+% \begin{verbatim}
+% In generating 4 thrines (fresh), we had the following
+% succeed-ct: 216376
+% clash-ct: 97712
+% cycle-ct: 6892
+% \end{verbatim}
 
 
-\section{Conclusions}\label{sec:conclusions}
+% The numbers for the more complicated queries from
+% \citet{byrd2017unifiedapproach} are also interesting to see.
 
-%%
-%% The acknowledgments section is defined using the "acks" environment
-%% (and NOT an unnumbered section). This ensures the proper
-%% identification of the section in the article metadata, and the
-%% consistent spelling of the heading.
+% It would be interesting to know the ``run lengths'' of these successes
+% and either kind of failure as we compute, either in between
+% interleaves or in each interleave. For the \citet{byrd2017unifiedapproach}
+% final interpreter example. It seems that in practice on many examples
+% \citeposs{robinson1965machine} version out-performs the
+% asymptotically-superior algorithms.
+
+% \href{file://~/Downloads/icfp-17/shared/}{file://~/Downloads/icfp-17/shared/}
+% \todo{Run}
+
+% \section{Related}\label{sec:related}
+
+
+% \section{Conclusions}\label{sec:conclusions}
+
+% %%
+% %% The acknowledgments section is defined using the "acks" environment
+% %% (and NOT an unnumbered section). This ensures the proper
+% %% identification of the section in the article metadata, and the
+% %% consistent spelling of the heading.
 
 % \begin{acks}
 %   We thank you all. 
