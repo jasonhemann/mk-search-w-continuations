@@ -1,0 +1,214 @@
+* Church Encoding of Lists and Streams
+
+** List DT
+
+Danvy doesn't say this, but the DT for lists is:
+
+// From: http://homepages.inf.ed.ac.uk/stg/NOTES/node41.html
+
+datatype 'a list = nil | :: of 'a * 'a list;
+
+same as: 
+
+List alpha = Nil | Cons of alpha (List alpha)
+
+c.f. 
+
+datatype 'a stream = end | more of 'a * (Unit -> 'a stream)
+
+** Stream DT
+
+In an eager language, we explicitly implement a DT of streams; finite
+lists built lazily. He says a thunk is used to delay computation.
+
+And gives the DT:
+
+Stream alpha = End | More of (alpha x (1 -> Stream alpha))
+
+More and Cons are effectively tags atop an otherwise anonymous tuple
+structure.
+
+// So, the Church encoded End (BTW, is that the constructor or
+destructor?) must be peeling off it's *own* thunk.
+
+The second component in a stream is a thunk, and it's for this reason
+that we give int -> (1! -> alpha) -> beta. Where the former here is
+int, I suppose. It's not important that the input type be int, because
+processing? 
+
+In Danvy's paper More takes two arguments, where Cons only takes
+one. He does go into additional detail about the move from lists
+through Hughes lists to get to the Church encoding. In the case of the
+lazy streams, he doesn't go through all that detail. But the
+difference is a difference of choice: the one or two argument versions
+are distinct orthogonal choices from the eager and laziness.
+
+End is thunked to prevent premature evaluation of S_e. For sure. But,
+we ask rhetorically, _why_ is that? The answer, both why is that done
+and where is that done, is in the "hidden move" from first-order
+datatype to the "Hughes style" "prefix stream" functions; we need to
+continue to prevent premature evaluation, so when we get down to the
+bottom of the prefix, we have to evaluate the list. Thus the thunk
+invocation. In the original datatype, there isn't a delay, and that's
+actually fine and proper. It's when you go higher order that you need
+to. 
+
+Danvy says that Church encoding is abstracting over _selector_
+functions. Specifically. Whether it's Church encoding or Hughes
+encoding, we'd (probably) want to have a Delay constructor.  One
+parameter for each of the datatype choices. And we curry them out one
+at a time.
+
+Just as (presumably) 
+
+datatype 'a list = nil | :: of 'a * 'a list;
+a list \equiv Nil | Cons of a (a List)
+
+^
+relates by a Church encoding of a Hughes-HO xlation of
+v
+
+nil    = \s_c.\ys.ys
+cons x = \s_c.\ys.s_c x ys  
+
+// The HO representation of Cons.
+
+So too does:
+
+datatype 'a stream = end | more of 'a * (Unit -> 'a stream)
+a stream \equiv End | More of (a x (1! -> a stream))
+
+^
+relates by a Church encoding (*of a Hughes-like HO xlation*) to
+v
+
+end       = \s_m.\s_e.s_e()
+more x xs = \s_m.\s_e.s_m x xs
+
+Why does more require both arguments when cons doesn't?
+
+The Church encoded end function has a thunk on it, whereas in the
+stream variant it doesn't. This is because of the difference required
+to HO-encode streams vs lists, maintaining evaluation order via the
+xformation. 
+
+Do I have `cons` notationally written correctly, or should it instead
+be Cons of (a x (a list))---that is, does each constructor always and
+only take a tuple?
+
+Why in the stream Church encoding do we seem to look at s_e as a
+constructor, where nil didn't seem to be obviously a constructor? 
+
+Maybe because the whole stream is delayed, and this is the part where
+we 'reify' it, to show?
+
+We said we abstract over the selector functions; what does that mean? 
+
+// that 1->Stream is a head-delayed stream.
+
+// Could be that End and Nil are not just names for one another:
+
+One possible solution to this puzzle is that the list DT are data and
+the stream DT are co-data. This goes unmentioned in the Danvy article.
+
+Sullivan's 2018 Dissertation
+(https://www.cs.uoregon.edu/Reports/MS-201806-Sullivan.pdf) gives a
+wonderful up-to-date and recent description of the comparison:
+
+And it might well be important *that* we _should_ express streams as
+co-datatypes, because of possible infinite computations, and wanting
+to build up evaluation contexts or `little continuations`. Nullary
+evaluation contexts are maybe a trivial case.
+
+Pg 10 of Sullivan
+(https://www.cs.uoregon.edu/Reports/MS-201806-Sullivan.pdf) discusses 
+
+First diagram under Sullivan 2.1.2 says that from x in the empty context
+
+pp 19. 
+
+``This expression first expects an applicative context which we see by
+the shape of the inner-most copattern (either [·] True or [·]
+False). Next, the expression pattern matches the argument stored in
+the calling context which is a Bool. It then creates a “with” type
+whose first element is an integer ... We notice a point of asymmetry
+between data and codata, in addition to not being able to express the
+dual of the tensor product. Copatterns are expressive enough to
+contain patterns, but patterns cannot contain copatterns. This means
+that whereas we can express a function A → B as codata we cannot
+express its dual, the subtraction connective A − B, which would
+involve embedding a copattern in a pattern.''
+
+codata Stream A where
+  Head : Stream A → A
+  Tail : Stream A → Stream A
+
+
+cocase (Head [·]) (fix s in { Head [·] → 0
+                              Tail [·] → s})
+
+// That's suspicious. And it seems like a co-data thing to do. 
+stream a = Nil | Cons a x stream a | Delay stream a
+
+// So, the question then becomes, what's a destructor for one of our streams? 
+
+What's a destructor for their streams? Head, and Tail. 
+
+codata *look* like data, when written out in datatypes, but they
+*behave* differently and are *used* differently.
+
+So, even Danvy's streams are not quite the stream type that I think
+Sullivan introduces. Sullivans are infinite streams, with a Head and
+Tail destructor. 
+
+The Head and Tail I think correspond to the More in the Danvy stream
+DT, but I don't think that we have any 
+
+Instead, it's the pn(u) example from pg 22 of
+http://www.cs.ru.nl/B.Jacobs/PAPERS/JR.pdf
+
+Let the functor T(X) = 1 + A x X have a coalgebra pn: U -> 1 + A x U,
+where pn stands for `possible next' If we have an elemunt u \in U,
+then we can see the following
+
+1. Either pn(u) = k(*) \in 1 + A x U is in the left component of +. If
+   this happens, our experiment stops, since there is no state
+   (element of U) left with which to continue.
+
+2. Or pn(u) = k'(a,u) \in 1 + A x U is in the right +-component. This
+   gives us an element a \in A and a next element u' \in U of the
+   carrier, with which we can proceed.
+
+The observable outcomes are elements of the set A^{\inf} = A^{*} +
+A^{\mathbb{N}} of finite and infinite lists of A's.
+
+Maybe it's the case that we *can* express, as co-data, our streams in
+a CBV or CBN situation. However, in the CBN the Explicit Delays are
+superfluous *except* for the interleave points.
+
+Whereas in the CBV situation we actually see their use. 
+
+final co-algebra of the functor T(X) = 1 + (A x X) has as carrier the
+set A^{\inf} of finite and infinite lists of As. The associated
+"possible next" co-algebra structure 
+
+So, what domains do *we* have? We have not only the elements that the
+streams contain (the "state"), but also the positions of the delays in
+those streams, partially evaluated, so, like also an unfolding stream
+of booleans? for "explicitly marked delay cdr" or not.
+
+stream alpha = Nil | Cons alpha x stream alpha | Delay stream alpha. 
+
+This should have *meaning* independent of whether we think of it in
+CBV or CBN.
+
+And it might be that the CBN meaning is easier to *grasp*. The delay
+marker doesn't do anything special in the CBN model. It's just a
+separate constructor 
+
+stream alpha x bool = Nil | Cons alpha bool  
+
+Coalgebras, like algebras, can be seen as models of a signature of
+operations---not of constructor operations, but of destructor/observer
+operations.
+
