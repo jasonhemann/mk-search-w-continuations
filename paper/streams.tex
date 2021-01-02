@@ -313,13 +313,61 @@ single-continuation implementation of backtracking, and the streams of
 \cref{mnt:eager-lazy-datatypes} correspond to the two-continuation
 implementation of backtracking, then to what sort of continuation
 based implementation of backtracking should our streams in
-\cref{mnt:even-more-odd} correspond? 
+\cref{mnt:even-more-odd} correspond? To find our way there, we first
+reconstruct in full detail \citeposs{danvy2002unifying} construction
+of their connections between list (stream) backtracking and single
+(double) continuation backtracking. We then carry this connection
+through \citeposs{wadler1998add} even streams before we proceed
+forward into our own curious stream datatype.
 
-
-
+using \citeposs{hagino1989codatatypes} codatatype syntax.
 
 \section{Background}\label{sec:background}
 
+We begin first with eager lists and continuations.
+
+\citeauthor{danvy2002unifying} say
+%
+\begin{quote}
+  A conceptual link between the list monad and the continuation monad
+  with answer type β list → β list can be made through a Church
+  encoding) of the higher-order representation of lists proposed by
+  Hughes.
+\end{quote}
+
+We stop to unpack this statement, since this connection guides the
+rest of our development. The authors first transform lists from the
+standard, CS101 first-order representation of
+\cref{mnt:eager-lazy-datatypes} to the 
+
+in of
+
+
+ τ List                                                                  ≡                                        Nil                                              Cons of (τ × τ List)                            
+                                                                         abstract over tail                                                                        new type, new constructors                      
+ τ HList =_df τ List → τ List                                            ≡                                        λl.l : τ HList                                   λl.Kons of (τ x l) : τ HList                    
+                                                                         curry Kons                                                                                                                                
+ τ HList                                                                 ≡                                        λl.l : τ HList                                   λl.((cKons of τ) l) : τ HList                   
+                                                                         Church encode (abstract over selector)                                                    new type, new constructors                      
+ τ CList =_df (τ → τ HList) → τ HList                                    ≡                                        Nul \= λsc.λl.l : τ CList                        Qons x \= λsc.λl.(sc x) l : τ CList             
+                                                                                                                                                                   where Qons : τ → τ CList                        
+                                                                                                                                                                                                                   
+                                                                                                                  Unchanged from above                             NonIn x xs \= λsc.λl.(sc x) xs : τ CList        
+                                                                                                                                                                   Unchanged from above                            
+                                                                         α  equivalent to                                                                                                                          
+                                                                         ≡                                        Nul \=  λk.λl.l : τ CList                        Qons x \= λk.λl.((k x) l)  : τ CList            
+                                                                                                                  true just b/c λl.l : τ HList                     Here l ηs away                                  
+ τ (τ HList) C =_df (τ → τ HList) → τ HList                                                                       Nul \=  λk.λl.l : τ (τ HList) C                  Qons x \= λk.λl.((k x) l)  : τ (τ HList) C      
+                                                                         an instance of the more general                                                                                                           
+ τ (σ HList) C =_df (τ → σ HList) → σ HList                                                                       Uniformly change the type                        Uniformly change the type                       
+                                                                         an instance of the more general                                                                                                           
+ τ (σ List → σ List) C =_df (τ → (σ List → σ List)) → (σ List → σ List)                                           Uniformly change the type                        Uniformly change the type                       
+                                                                         an instance of the more general                                                                                                           
+ τ (δ → δ) C =_df (τ → (δ → δ)) → (δ → δ)                                                                         Uniformly change the type                        Uniformly change the type                       
+                                                                         an instance of the more general                                                                                                           
+ τ γ C =_df (τ → γ) → γ for answer type γ                                                                         This type is too general for these two programs  This type is too general for these two programs 
+                                                                         which notationally we normally elide as                                                                                                   
+ τ C =_df (τ → γ) → γ for answer type γ                                                                                                                                                                            
 
 % Wadler even odd. Even *odder* streams.
 
