@@ -85,7 +85,7 @@ specializing. Neither of these approaches seemed successful
 ;; Extend the functionality
 
 ;; Use a different continuations for each of the "built-outside-of-a-k" tail calls
-;; Doesn't run ri8ght now b/c we don't have `sk` as a named continuatino 
+;; Doesn't run ri8ght now b/c we don't have `sk` as a named continuation 
 (define (rf-cps-2x-both-part-2 x l k k2)
   (match l
     [`() (k2 l)]

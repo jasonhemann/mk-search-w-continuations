@@ -309,6 +309,22 @@ Not _entirely_ sure I'm happy with the walk-ans-es
         (λ (fk)
           (fk)))))
 
+  ;; Cf b/c this has a recursion without the delay
+  ;; faster-mk sytle definition of interleaving mplus (w/o delay,
+  ;; interleave on every)
+  
+  ;; (define (mplus m1 m2)
+  ;;   (λ (sk)
+  ;;     (λ (fk)
+  ;;       ((m1 (lambda (a)
+  ;;              (lambda (fk)
+  ;;                ((sk a)
+  ;;                 (lambda ()
+  ;;                   (mplus m2 (fk)))))))
+  ;;        (λ ()
+  ;;          ((m2 sk)
+  ;;           fk))))))
+
   (define (mplus m1 m2)
     (λ (dk)
       (λ (sk)
