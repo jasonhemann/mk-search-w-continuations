@@ -1,0 +1,42 @@
+What has been difficult has been determining _what_ the continuations
+are and should be at various positions in the presence of these
+delays. These delays themselves seem to return a continuation. I don't
+know if the delay-continuation arguments need to themselves take in
+the sk/fk, or if maybe sk and fk need to take in this extra
+continuation. Perhaps something in between?
+
+One thing that *did* help is to look at the set of goals we're going
+to try, like, in order as a list, the way that Jaffar and Lassez do
+it, and also the way that the usual Prolog style folk look at it. That
+makes it easier to read what's going on w/the continuations, and maybe
+gives a clue as to what to do when we bring them in.
+
+Are the sk and fk the meta-continuations? Or is it the dk that is?
+Neither? Both?
+
+So the success continuation is what it is that we do next w/the conjunction
+the fail continuation is what we do next w/the disjunction
+
+We seem to intermix their operations b/c the success depends on the
+failure all the way up. 
+
+So, I need to be able to think about what it is that that's doing. 
+
+This is very interesting, the description of what happens. Maybe on a
+small, level. Do the options of how things change as they unfold, and
+see if there's a pattern that manifests
+
+So, for instance. We have disj and conj, those are binary. Under each
+of those we could have disj, conj, delay, return, and fail. However we
+think (thought?) we understood what happened and what was supposed to
+happen for the ones with sk and fk, so in those cases let's not
+interpose ourselves. 2^5, getting rid of ... just sk/fk ... and so
+getting rid of inner disj conjs with just sk fk. 
+
+I wrote a program for that. 
+
+But what's interesting here is that we have done an almost doubly-CPSing
+
+The first is a traditional continuation starting off w/(lambda (v)
+v). Then we CPS wrt that, a la Fisher or a la Plotkin (I forget which). 
+

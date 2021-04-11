@@ -149,19 +149,21 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
   (define kons (λ (a) (λ (fk) (cons a (fk)))))
   (define nill (λ () '()))
 
   (define (loop n)
     (λ (c)
-      (if (zero? n)
-          (c (lambda (sk)
-               (lambda (fk)
-                 '())))
-          (c (loop (sub1 n))))))
+      (((c
+         (lambda (c^)
+           (if (zero? n)
+               '()
+               ((loop (sub1 n)) c^))))
+        kons)
+       nill)))
 
   (define loop*
     (λ (c)
@@ -172,13 +174,13 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk g) sk) fk))))))
+            (dk g))))))
 
   (define-syntax-rule (freeze e) 
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk e) sk) fk)))))
+            (dk e)))))
   
   (define (unit a)
     (λ (dk)
@@ -238,44 +240,40 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (require rackunit)
   (provide (all-defined-out))
 
-  ;; Ugly external interface for cover
   (define (run . args)
     (cond
-      ((null? (cdr args)) ((((car args) loop*) kons) nill))
-      (else ((((cadr args) (loop (car args))) kons) nill))))
+      ((null? (cdr args)) (loop* (car args)))
+      (else ((loop (car args)) (cadr args)))))
   
+  (define kons (λ (a) (λ (fk) (cons a (fk)))))
+  (define nill (λ () '()))
+
   (define (loop n)
     (λ (c)
-      (if (zero? n)
-          (c 
-           (lambda (sk)
-             (lambda (fk)
-               '())))
-          (c (loop (sub1 n))))))
-
-  (define kons (λ (a)
-                 (λ (fk)
-                   (cons a (fk)))))
-
-  (define nill (λ ()
-                 '()))
+      (((c
+         (lambda (c^)
+           (if (zero? n)
+               '()
+               ((loop (sub1 n)) c^))))
+        kons)
+       nill)))
 
   (define loop*
     (λ (c)
-      (c loop*)))
-  
-(define-syntax-rule (define-relation (n . args) g)
+      (((c loop*) kons) nill)))
+
+  (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk g) sk) fk))))))
+            (dk g))))))
 
   (define-syntax-rule (freeze e) 
       (λ (dk)
         (λ (sk)
           (λ (fk)
-            (((dk e) sk) fk)))))
+            (dk e)))))
 
   (define (return a)
     (λ (dk)
@@ -289,16 +287,12 @@ Not _entirely_ sure I'm happy with the walk-ans-es
         (λ (fk)
           (((m
              (λ (m^)
-               (((dk ((bind m^) f))
-                 sk)
-                fk)))
+               (dk ((bind m^) f))))
             (λ (b)
               (λ (fk)
                 ((((f b)
                    (lambda (m^)
-                     (((dk m^)
-                       sk)
-                      fk)))
+                     (dk m^)))
                   sk)
                  fk))))
            fk)))))
