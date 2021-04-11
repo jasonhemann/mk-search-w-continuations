@@ -95,6 +95,11 @@ Hughes-style higher-order encoding of numerals, but not then Church
 encoded. The first-order representation, would then be ~add1 (add1
 0)~, which actually makes sense.
 
+When he says abstracting over selector functions, what he means here
+is that instead he is replacing the constructor with the application
+of an abstraction over all the possible selector functions (being car,
+cdr, etc).
+
 Danvy points out that ~nil~ and ~cons x~ both have the same type, and
 that is ~selector-function → old-list-rep →
 old-list-rep~. (~old-list-rep~ is right now how I'm saying ~β list~
@@ -134,9 +139,16 @@ place in the Figure 5 interpreter (as it is presently written) that we
 see the second continuation, or the list argument, explicitly
 exposed. We do see it show up in the return values of those help
 functions, and we do see it buried in the non-tail composition
-operator. But that ~ifte~ operation is the only place that we have to
-expose, explicitly, the ~λl.~—because we need to duplicate it in the
-body.
+operator. But that ~ifte~ operation is the only place in the semantics
+of the interpreted language (besides as return values in those help
+functions) that we have to expose, explicitly, the ~λl.~—because we
+need to duplicate it in the body. 
+
+Remember we got to this operation by starting w/the monadic
+interpreter, specializing to the continuation monad, inlining the
+definitions of the operations, and then beta reducing where
+possible. This produces a continuation-passing semantics but not in
+CPS. 
 
 I don't have it *quite* yet, but compare the below. Bear in mind that
 the variable names here kinda collide; he'd've much improved the whole
@@ -157,7 +169,7 @@ of the other ones look the same *because* we pulled out those two
 "help functions", and they didn't do anything. 
 
 It still bears discussing/thinking how ~λl.l~ transforms into
-~f()~. But this is getting closer. How's that? 
+~f()~. But this is getting closer. How's that?  
 
 We know that, given the interpreter in Figure 5, we'd have to CPS ([[https://pdfs.semanticscholar.org/a9f0/aa4118e29f94d904a21810f83499ae13a98f.pdf][à
 la Fischer]]) the RHS to get it in a tail-recursive form. True. And we
@@ -176,25 +188,35 @@ list monad, the present continuation monad can be linked to the stream monad
 by a Church encoding of the data type of streams:
 #+END_EXAMPLE
 
+The list monad, when you change the lists to higher-order Hughes
+encodings, matches up to the continuation datatype by Church encoding.
 
-We *do* in fact have (something like) the picture that I thought we did.
+Here is how we move from END to lambda e.e(). End looks the same as
+Nil, a nullary constructor, to start with. Nil transforms as \l.l. The
+Hughes representation of streams, however, would be \e.e(), because to
+higher-order encode streams, we have to make sure and not eagerly
+evaluate their pieces. This end right here is where you actually
+*need* to do that amount of work, to kick the stream off. 
 
-I do not understand below how we move from END to lambda e.e(). End
-looks the same as Nil, a nullary constructor. Since Nil is \l.l, and
-it's a uniform transformation over datatypes, why isn't End \e.e? Cons
-and More don't line up, we have the explicit delay in the cdr of
+So what we have is still /kind of/ a uniform transformation over
+datatypes. But because it's the *rest* of the stream that has to come
+in lazy, we adjust end so that it always *takes* a lazy stream. Since
+that's what the cons eats too. This is all the higher-order encoding
+bit.
+
+It makes sense how you get to \e.e(), assuming you do the higher-order
+encoding of streams, and don't change their rep. 
+
+Cons and More don't line up, we have the explicit delay in the cdr of
 More. So the disparity between those two makes some sense. Esp when we
 recognized the connection between More and NonIn
 
 To consider: maybe if I think of the streams like codata. 
 
 
-
-
-
 #+BEGIN_QUOTE
 | τ List                                                                 | ≡                                       | Nil                                             | Cons of (τ × τ List)                            | \= | thunk datatype's cdrs | ⇒ | τ Stream                                                                                           | ≡                                       | End                                             | More of (τ × (1 → τ Stream))                    |
-|                                                                        | abstract over tail                      |                                                 | new type, new constructors                      |    |                       |   | (NB: Hughes streams come in thunkd)                                                                | abstract over thunked tail              |                                                 | new types, new constructors                     |
+|                                                                        | abstract over tail                      |                                                 | new type, new constructors                      |    |                       |   | (NB: Hughes streams come in thunked)                                                               | abstract over thunked tail              |                                                 | new types, new constructors                     |
 | τ HList =_df τ List → τ List                                           | ≡                                       | λl.l : τ HList                                  | λl.Kons of (τ x l) : τ HList                    | \= |                       | ⇒ | τ HStream =_df (1 → τ Stream) → τ Stream                                                           | ≡                                       | λe.e() : τ HStream                              | λe.Mure of (τ × e) : τ HStream                  |
 |                                                                        | curry Kons                              |                                                 |                                                 |    |                       |   |                                                                                                    | curry Mure                              |                                                 | same type b/c we don't prematurely eval e       |
 | τ HList                                                                | ≡                                       | λl.l : τ HList                                  | λl.((cKons of τ) l) : τ HList                   | \= |                       | ⇒ | τ HStream                                                                                          | ≡                                       | λe.e() : τ HStream                              | λe.((cMure of τ) e) : τ HStream                 |
@@ -248,7 +270,7 @@ The Delay constructor itself isn't lazy. The delay constructor eagerly
 consumes the computation. That's fine. It's that there's something
 lazy about what that computation _produces_. So, what is it that such
 a computation produces, and does that mean that the datatype of the
-computation is now mutually dependent upon the type of the DList?
+computation is now mutually dependent upon the type of the DList? 
 
 So then, what is a computation C? ~τ~ are the types of the elements of
 the streams. These were numbers for Danvy. For us, ~τ~s are states.
@@ -274,12 +296,19 @@ However, that expression just evaluates to a stream of some kind. I
 don't know if the fact of how the code creates the stream matters.
 
 I'm re-reading the "... Without Even Being Odd" paper, to remind
-myself of how this related in with our stream definitions. This was
-getting temporarily confusing. I think that I can start off from
-either the Even style with difficulty or the Odd style with
-difficulty, and try and get to one or the other. The implementations
-in this paper offer a map operator (bind), an infinite stream
-generator (useful), and the DTs themselves.
+myself of how this related in with our stream definitions. Wadler's
+paper is about the preferred syntax for lazy bindings, because the
+at-the-time common syntax suggested an unfortunate quirk in using lazy
+evaluation (namely using those lazily constructed data forced too much
+evaluation.)
+
+The implementations in Wadler's paper offer a map operator (bind), an
+infinite stream generator (useful), and the DTs themselves.
+
+It seems like we can view our datatype either as fusing together the
+two mutually recursive datatypes in the even style with difficulty or
+as fusing together the two mutually recursive datatypes in the Odd
+style with difficulty. 
 
 Our relations look like their countdown from the even style
 w/difficulty.
@@ -299,7 +328,6 @@ w/difficulty.
 #+END_QUOTE
 
 
-
 #+BEGIN_QUOTE
 | τ DList                                    | ≡ | Nil               | Cons of (τ × τ DList)           | Delay of (1 → τ DList)         |                                                               |
 | Change representing a sometimes thunkd cdr |   |                   |                                 |                                |                                                               |
@@ -309,19 +337,23 @@ w/difficulty.
 |                                            |   |                   |                                 |                                |                                                               |
 #+END_QUOTE
 
-
 ** Mitch and I find a bug in Danvy in that ifEmptyC takes the xs and ys arguments in the wrong order.
 
-** We also discover a notational bug, that only if one reads the C2 expressions as uncurried are they in tail-form. Otherwise, they aren't
+** We also discover a notational bug, that only if one reads the C2 expressions as uncurried are they in tail-form. Otherwise, they arent'
 
-Based on that we discover how, precisely, the thunking of the cdrs of the datatypes takes a non-tail form expression to tail form: b/c the thunk delays the evaluation of a nested computation. 
+Based on that we discover how, precisely, the thunking of the cdrs of
+the datatypes takes a non-tail form expression to tail form: b/c the
+thunk delays the evaluation of a nested computation. That's only
+sort-of true, though. If you're allowed to curry and uncurry at your
+leisure, then it shouldn't really matter. 
 
 So. What we've discovered, I think, is that the problem is the
 following: we must take this "thunking the cdrs", a meta-operation
 over the datatypes transforming a DT from one to another, and now make
 it /internal/ /to/ the DT itself.
 
-Then oughtn't we be able to reach what we're after as a result of sk/fk transformation over the CBV encoding of the delay terms? 
+Then oughtn't we be able to reach what we're after as a result of
+sk/fk transformation over the CBV encoding of the delay terms?
 
 This might argue for building force and delay as components of the
 easy language, and run of the delay monad, and then trying to build
@@ -398,6 +430,35 @@ Delay Shift Reset
 
 <Δ (foo q), iSK, iFK>
 
+** Here, we attempt to encode Wadler's easy streams
+
+Delay is a difficult operation in an eager language. Here, we try to
+code around this difficulty. We can encode force and delay in a
+continuation passing style. , we can write these stream datatypes as
+instances of probably codata expressions in lambda datatypes
+
+*** How would we encode two mutually recursive datatypes with lambdas? 
+
+#+BEGIN_QUOTE
+| τ EvenStream       | ≡ | (Delay τ EvenStream_) | with | τ EvenStream_                                     | ≡ | Nil_                   | Cons of (τ × τ EvenStream)         |
+|                    |   |                       |      |                                                   |   |                        |                                    |
+| τ HEvenStream =_df | ≡ |                       |      | τ HEvenStream_ =_df τ EvenStream -> τ EvenStream_ |   | λe.e() :τ HEvenStream_ | (λe.(Cons τ × e)) : τ HEvenStream_ |
+|                    |   |                       |      |                                                   |   |                        |                                    |
+
+#+END_QUOTE
+
+# Data + Codata 
+
+We are constructing *either* data or codata. They are either finite or
+infinite. We know when we are constructing data. I *sometimes* know
+when I'm encoding codata. Codata are the generators and such, as well
+as unproductiveo. What we have aren't data. They aren't codata. These
+things aren't a datatype. 
+
+When we use them, IIUC, we use all and only guarded corecursions (via
+~define-relation~). So. Might be that I need to go through the effort
+at first, type level, to determine whether or not they produce data or
+codata. So, undecidable problem in the type system? 
 
 
 
