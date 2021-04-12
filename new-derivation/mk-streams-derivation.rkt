@@ -2,11 +2,29 @@
 
 #| 
 
-_Entirely_ sure I'm not happy with the run
+Here, however, in this version, both failure continuations and delay
+continuations return computations to be invoked. This is because
+failure actually does adjust the context in which the computation is
+evaluated.
 
-Not _entirely_ sure I'm happy with the walk-ans-es
+I want to confirm, however, that this actually *does* still maintain
+the property of continuously producing answers up til the first delay,
+and *that* these are invoked until then. 
 
-|#
+It seems like we are `inc`ing with every delay, but just
+resuming. Which is to say, we have a delay inside every computation
+that comes back. 
+
+Is that like saying you'd return a single non-empty *list* of answers,
+together with the delay as a failure continuation? Is this what I
+wanted?
+
+(define-relation (l n)
+  (mplus (unit n) (mplus (unit n) (l n))))
+
+(length (run 3 (mplus (l 5) (l 6))))
+
+|# 
 
 (module streams-unit-map-join racket
   (require (combine-in rackunit racket/promise racket/trace))
@@ -151,24 +169,38 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
 
+  ;; (define ((walk-ans n) c)
+  ;;   (((c (loop (sub1 n)))
+  ;;     (lambda (a)
+  ;;       (lambda (c)
+  ;;         (cons a ((walk-ans n) c)))))
+  ;;    (lambda () '())))
+  
   (define (loop n)
     (λ (c)
       (((c
-         (lambda (c^)
+         (λ (c^)
            (if (zero? n)
                '()
                ((loop (sub1 n)) c^))))
-        (lambda (a)
-          (lambda (c)
+        (λ (a)
+          (λ (c)
             (cons a ((loop n) c)))))
        (λ ()
          '()))))
 
+  ;; (define (walk-ans* c)
+  ;;   (((c loop*)
+  ;;     (lambda (a)
+  ;;       (lambda (c)
+  ;;         (cons a (walk-ans* c)))))
+  ;;    (lambda () '())))
+  
   (define loop*
     (λ (c)
       (((c loop*)
-        (lambda (a)
-          (lambda (c)
+        (λ (a)
+          (λ (c)
             (cons a (loop* c)))))
        (λ () '()))))
 
@@ -204,8 +236,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
           (((m1
              (λ (c1^)
                (dk (mplus m2 c1^))))
-            (lambda (a)
-              (lambda (c)
+            (λ (a)
+              (λ (c)
                 ((sk a) (mplus c m2)))))
            (λ ()
              (((m2 dk) sk) fk)))))))
@@ -256,12 +288,12 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define (loop n)
     (λ (c)
       (((c
-         (lambda (c^)
+         (λ (c^)
            (if (zero? n)
                '()
                ((loop (sub1 n)) c^))))
-        (lambda (a)
-          (lambda (c)
+        (λ (a)
+          (λ (c)
             (cons a ((loop n) c)))))
        (λ ()
          '()))))
@@ -269,8 +301,8 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define loop*
     (λ (c)
       (((c loop*)
-        (lambda (a)
-          (lambda (c)
+        (λ (a)
+          (λ (c)
             (cons a (loop* c)))))
        (λ () '()))))
 
@@ -292,12 +324,6 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       (λ (sk)
         (λ (fk)
           ((sk a) (mzero))))))
-
-;;  Is how to pick up the search after you find an answer the same as
-;; what you would have done with failure, or is that now something
-;; different? And if so, what?  Should we be returning a residual
-  ;; computation, and if so, how do we represent it.
-  ;;Maybe we should be calling lambda (dk) (sk ) fk (fk
   
   (define ((bind m) f)
     (λ (dk)
@@ -327,11 +353,12 @@ Not _entirely_ sure I'm happy with the walk-ans-es
           (((m1
              (λ (c1^)
                (dk (mplus m2 c1^))))
-            (lambda (a)
-              (lambda (c)
+            (λ (a)
+              (λ (c)
                 ((sk a) (mplus c m2)))))
            (λ ()
              (((m2 dk) sk) fk)))))))
+
   ;; Cf b/c this has a recursion without the delay
   ;; faster-mk sytle definition of interleaving mplus (w/o delay,
   ;; interleave on every)
@@ -339,10 +366,10 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;; (define (mplus m1 m2)
   ;;   (λ (sk)
   ;;     (λ (fk)
-  ;;       ((m1 (lambda (a)
-  ;;              (lambda (fk)
+  ;;       ((m1 (λ (a)
+  ;;              (λ (fk)
   ;;                ((sk a)
-  ;;                 (lambda ()
+  ;;                 (λ ()
   ;;                   (mplus m2 (fk)))))))
   ;;        (λ ()
   ;;          ((m2 sk)
