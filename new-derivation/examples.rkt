@@ -1,6 +1,61 @@
 #lang racket
 (require rackunit)
 
+#| 
+
+This file should contain a sufficient set of examples to demonstrate
+failures with any number of various potential models for adding delays
+and interleaving to a multi-continuation based microKanren. 
+
+Each example should be prefixed by a description of the putative 
+implementation of delays and return it's supposed to match. 
+
+I expect each to show different behavior between a stream-based
+implementation and that continuation implementation.
+
+The key choices are freeze (a lower-level, sub-define-relation
+primitive I've created for testing) and loop* (another lower-level
+primitive, below run, I've created for testing).
+
+
+;; first idea: The same way sk doesn't use the fk, and the way fk
+;; doesn't use the sk, then dk shouldn't use either of those two. 
+;; So we will just return the action to later compute, and we'll
+;; always continue with the same basic sk and fk, but now in another
+;; deeper part of the tree.
+
+  (define-syntax-rule (freeze e) 
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (dk e)))))
+
+  (define loop*
+    (λ (c) 
+      (((c loop*) kons) nill)))
+
+This model breaks because you lose some of the search tree upon
+delaying.
+
+;; second idea: dk should delay the computation, but make sure and
+;; start right back up with the same old success and failure
+;; continuations
+
+  (define-syntax-rule (freeze e) 
+      (λ (dk)
+        (λ (sk)
+          (λ (fk)
+            (((dk e) sk) fk)))))
+
+  (define loop*
+    (λ (c) (c loop*)))
+
+This too fails, and I think I have a world's smallest, simplest
+program to demonstrate why it does.
+
+|# 
+
+
 ;; Any one of these 4
 ;; (require (submod "mk-streams-derivation.rkt" streams-unit-map-join))
 ;; (require (submod "mk-streams-derivation.rkt" streams-bind-return))
@@ -43,6 +98,13 @@ independent of one another, to get the right answers out.
        fk)))))
 |#
 
+(run (unit 5))
+  (define-relation (d n)
+    (unit n))
+
+(run (d 5))
+
+(module+ test 
 (test-begin 
   (define-relation (a n)
     (b n))
@@ -53,8 +115,8 @@ independent of one another, to get the right answers out.
   (define-relation (d n)
     (unit n))
 
-  (check-equal? (run (d 5)) '(5))
-  (check-equal? (run (a 5)) '(5))
+  (test-equal? "get answers with delay" (run (d 5)) '(5))
+  (test-equal? "get answers through several delays" (run (a 5)) '(5))
 
   (test-begin 
     (define-relation (e n)
@@ -64,8 +126,8 @@ independent of one another, to get the right answers out.
     (define-relation (g n)
       (e n))
 
-    (check-equal? (run 7 (e 5)) '())
-    (check-equal? (run 500 (mplus (e 5) (a 5))) '(5))
+    (test-equal? "unproductive relation terminates on finite fuel" (run 7 (e 5)) '())
+    (test-equal? "interleaving behaves correctly, get answers" (run 500 (mplus (e 5) (a 5))) '(5))
     )
   
   (define-relation (h n)
@@ -75,38 +137,44 @@ independent of one another, to get the right answers out.
   (define-relation (j n)
     (mplus (h n) (a n)))
 
-  (check-equal? (run 20 (h 5)) '(5 5))
+  (test-equal? "interleave through mplus w/1-answer works" (run 20 (h 5)) '(5 5))
 
   (define-relation (l n)
     (m n))
   (define-relation (m n)
     (mplus (l n) (unit n)))
 
-  (check-equal? (run 7 (l 5)) '(5 5 5))
+  (test-equal? "interleave through mplus with multiple answers"
+    (run 7 (l 5)) '(5 5 5))
   )
 
 (test-begin 
   (define-relation (m n)
     (mplus (unit n) (m n)))
 
-  (check-equal? (run 1 (m 5)) '(5))
-  (check-equal? (length (run 50 (mplus (m 5) (m 6)))) 49)
-  (check-equal? (run 5 (mplus (m 5) (m 6))) '(5 6 5 6))
+  (test-equal? "without needing interleaving, mplus gets an answer through delays"
+               (run 1 (m 5)) '(5))
+  (test-equal? "mplus gets the expected number of answers for amnt of fuel"
+               (length (run 50 (mplus (m 5) (m 6)))) 49)
+  (test-equal? "run throuh mplus gets expected number and variety of answers"
+               (run 5 (mplus (m 5) (m 6))) '(5 6 5 6))
   )
 
 (test-begin 
  (define-relation (l n)
    (mplus (unit n) (mplus (unit n) (l n))))
 
- ;; This indicates that we are measuring the number of pulls, not the number of answers.
- (check-equal? (length (run 50 (mplus (l 5) (l 6)))) 98)
+ (test-equal? "Test indicates that we are measuring the number of pulls, not the number of answers."
+              (length (run 50 (mplus (l 5) (l 6)))) 98)
 
  (define-relation (unproductiveo x)
    (unproductiveo x))
 
- (check-equal? (run 50 (unproductiveo 5)) '()))
+ (test-equal? "unproductive relation is unproductive even w/ lots of fuel"
+  (run 50 (unproductiveo 5)) '()))
 
 ;; This seems promising, don't know if it's right.
+
 (test-begin 
   (define-relation (a n)
     (mplus (unit 'a) (b (add1 n))))
@@ -395,115 +463,178 @@ independent of one another, to get the right answers out.
 ;; <'(36 25)
 ;; '(36 25)
 
-;; The delay free program to test the order of answers coming out.
-;; uniquely decomposable, so we should be able to tell what came from where and precisely _how_ :-)
-(run (freeze (mplus
-              (freeze ((bind
-                        (freeze ((bind
-                                  (freeze (mplus
-                                           (freeze (return 2))
-                                           (freeze (return 3))
-                                           )))
-                                 (lambda (a)
+(test-begin 
+ ;; A giant delay free program to test the order of answers coming out.
+ ;; uniquely decomposable, so we should be able to tell what came from where and precisely _how_ :-)
+
+  (test-equal? "giant delay-free program for order of answers tests"
+   (run (freeze (mplus
+                 (freeze ((bind
+                           (freeze ((bind
+                                     (freeze (mplus
+                                              (freeze (return 2))
+                                              (freeze (return 3))
+                                              )))
+                                    (lambda (a)
+                                      (freeze (mplus
+                                               (freeze (return (* a 5)))
+                                               (freeze (return (* a 7)))
+                                               ))))))
+                          (lambda (b)
+                            (freeze (mplus
+                                     (freeze ((bind
+                                               (freeze (return (* b 11))))
+                                              (lambda (c)
+                                                (freeze (return (* b c 13)))
+                                                )))
+                                     (freeze (mplus
+                                              (freeze ((bind
+                                                        (freeze (return (* b 17))))
+                                                       (lambda (d)
+                                                         (freeze (return (* b d 19)))
+                                                         )))
+                                              (freeze (mplus
+                                                       (freeze (return (* b 23)))
+                                                       (freeze (return (* b 29)))
+                                                       )))))))))
+                 (freeze (mplus
+                          (freeze ((bind
+                                    (freeze ((bind
+                                              (freeze (mplus
+                                                       (freeze (return 31))
+                                                       (freeze (return 37))
+                                                       )))
+                                             (lambda (e)
+                                               (freeze (mplus
+                                                        (freeze ((bind
+                                                                  (freeze (return (* e 41))))
+                                                                 (lambda (f)
+                                                                   (freeze (return (* e f 43)))
+                                                                   )))
+                                                        (freeze ((bind
+                                                                  (freeze (return (* e 47))))
+                                                                 (lambda (g)
+                                                                   (freeze (return (* e 53)))
+                                                                   )))))))))
+                                   (lambda (h)
+                                     (freeze ((bind
+                                               (freeze (mplus
+                                                        (freeze (mplus
+                                                                 (freeze (return (* h 59)))
+                                                                 (freeze (return (* h 61)))
+                                                                 ))
+                                                        (freeze (mplus
+                                                                 (freeze (return (* h 67)))
+                                                                 (freeze (return (* h 71)))
+                                                                 )))))
+                                              (lambda (i)
+                                                (freeze (mplus
+                                                         (freeze ((bind
+                                                                   (freeze (return (* h i 73))))
+                                                                  (lambda (j)
+                                                                    (freeze (return (* h i j 79)))
+                                                                    )))
+                                                         (freeze ((bind
+                                                                   (freeze (return (* h i 83))))
+                                                                  (lambda (k)
+                                                                    (freeze (return (* h i k 89)))
+                                                                    )))))))))))
+                          (freeze (mplus
                                    (freeze (mplus
-                                            (freeze (return (* a 5)))
-                                            (freeze (return (* a 7)))
-                                            ))))))
-                       (lambda (b)
-                         (freeze (mplus
-                                  (freeze ((bind
-                                            (freeze (return (* b 11))))
-                                           (lambda (c)
-                                             (freeze (return (* b c 13)))
-                                             )))
-                                  (freeze (mplus
-                                           (freeze ((bind
-                                                     (freeze (return (* b 17))))
-                                                    (lambda (d)
-                                                      (freeze (return (* b d 19)))
-                                                      )))
-                                           (freeze (mplus
-                                                    (freeze (return (* b 23)))
-                                                    (freeze (return (* b 29)))
-                                                    )))))))))
-              (freeze (mplus
-                       (freeze ((bind
-                                 (freeze ((bind
-                                           (freeze (mplus
-                                                    (freeze (return 31))
-                                                    (freeze (return 37))
-                                                    )))
-                                          (lambda (e)
+                                            (freeze ((bind
+                                                      (freeze (return 97)))
+                                                     (lambda (l)
+                                                       (freeze (return (* l 101)))
+                                                       )))
                                             (freeze (mplus
-                                                     (freeze ((bind
-                                                               (freeze (return (* e 41))))
-                                                              (lambda (f)
-                                                                (freeze (return (* e f 43)))
-                                                                )))
-                                                     (freeze ((bind
-                                                               (freeze (return (* e 47))))
-                                                              (lambda (g)
-                                                                (freeze (return (* e 53)))
-                                                                )))))))))
-                                (lambda (h)
-                                  (freeze ((bind
-                                            (freeze (mplus
-                                                     (freeze (mplus
-                                                              (freeze (return (* h 59)))
-                                                              (freeze (return (* h 61)))
-                                                              ))
-                                                     (freeze (mplus
-                                                              (freeze (return (* h 67)))
-                                                              (freeze (return (* h 71)))
-                                                              )))))
-                                           (lambda (i)
+                                                     (freeze (return 103))
+                                                     (freeze (return 107))
+                                                     ))))
+                                   (freeze ((bind
                                              (freeze (mplus
-                                                      (freeze ((bind
-                                                                (freeze (return (* h i 73))))
-                                                               (lambda (j)
-                                                                 (freeze (return (* h i j 79)))
-                                                                 )))
-                                                      (freeze ((bind
-                                                                (freeze (return (* h i 83))))
-                                                               (lambda (k)
-                                                                 (freeze (return (* h i k 89)))
-                                                                 )))))))))))
-                       (freeze (mplus
-                                (freeze (mplus
-                                         (freeze ((bind
-                                                   (freeze (return 97)))
-                                                  (lambda (l)
-                                                    (freeze (return (* l 101)))
-                                                    )))
-                                         (freeze (mplus
-                                                  (freeze (return 103))
-                                                  (freeze (return 107))
-                                                  ))))
-                                (freeze ((bind
-                                          (freeze (mplus
-                                                   (freeze (return 109))
-                                                   (freeze (return 113))
-                                                   )))
-                                         (lambda (m)
-                                           (freeze ((bind
-                                                     (freeze (return (* m 127))))
-                                                    (lambda (n)
-                                                      (freeze (return (* m n 131)))
-                                                      )))))))))))))
+                                                      (freeze (return 109))
+                                                      (freeze (return 113))
+                                                      )))
+                                            (lambda (m)
+                                              (freeze ((bind
+                                                        (freeze (return (* m 127))))
+                                                       (lambda (n)
+                                                         (freeze (return (* m n 131)))
+                                                         )))))))))))))
+   '(14300
+     9797
+     103
+     107
+     32300
+     230
+     290
+     28028
+     197664197
+     212437853
+     63308
+     322
+     406
+     32175
+     63063
+     72675
+     345
+     435
+     142443
+     483
+     609
+     165408100578763903439517733077727
+     211872661518177380736555833924947
+     176812278728405769807080001373807
+     226480371591249076047320958929827
+     213305648807259742183279259921263
+     273225043825078501041769358945443
+     239535258551436034828672477002247
+     306822776993143400256529146456667
+     146286492986972112127
+     187379629563856943347
+     156372318415548184207
+     200298650274953084227
+     188646959786991614863
+     241639516550460735043
+     211844358272716580647
+     271353264185981859067
+     681203728600791516219761331692287
+     872559726577778208828745787621107
+     296868658084609489807
+     380261622554362805827
+     728169800092946059136378027930767
+     932718972305634218630210593432387
+     317336477084984749087
+     406479028303586325907
+     878461228867840596469551455893903
+     1125228558634773449994897972028483
+     986483193299796045177769857242407
+     1263594823808842272538267025394427
+     382833497886185578783
+     490374726701101590163
+     429909481587048675127
+     550674759924315686347))
 
 
-;; A simple enough program to debug and work through. 
+ 
+ )
+(test-begin
+;; Really simple programs to debug and work through.
 
-(run ((bind
-       (freeze (return 2)))
-      (lambda (a)
-        (return (* a 5)))))
+  (check-equal? 
+   (run ((bind
+          (freeze (return 2)))
+         (lambda (a)
+           (return (* a 5)))))
+   '(10))
 
 ;;; could not be simpler program
-(run ((bind
-       (freeze (mzero)))
-      (lambda (a) (mzero))))
-
+  (check-equal? 
+   (run ((bind
+          (freeze (mzero)))
+         (lambda (a) (mzero))))
+   '())
+)
 
 ;; (run (letrec 
 ;;          ((bind (lambda (m) 
@@ -783,13 +914,11 @@ independent of one another, to get the right answers out.
   (λ (c)
     (c loop*)))
 
-
-
-((((λ (fk)
-     (fk))
-   nill)
-  kons) 
- nill)
+;; ((((λ (fk)
+;;      (fk))
+;;    nill)
+;;   kons) 
+;;  nill)
 
 ;; The solution must be different, perhaps more complex than either of
 ;; those.
@@ -830,5 +959,4 @@ independent of one another, to get the right answers out.
 
 ;; We could say that we parameterize the success and failures, so that
 ;; We know what to do when we figure out the order.
-
-
+)
