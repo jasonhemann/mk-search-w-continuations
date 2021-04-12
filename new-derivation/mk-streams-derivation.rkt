@@ -146,14 +146,10 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (require rackunit)
   (provide (all-defined-out))
 
-  ;; Ugly external interface for cover
   (define (run . args)
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
-  
-  (define kons (λ (a) (λ (fk) (cons a (fk)))))
-  (define nill (λ () '()))
 
   (define (loop n)
     (λ (c)
@@ -162,12 +158,19 @@ Not _entirely_ sure I'm happy with the walk-ans-es
            (if (zero? n)
                '()
                ((loop (sub1 n)) c^))))
-        kons)
-       nill)))
+        (lambda (a)
+          (lambda (c)
+            (cons a ((loop n) c)))))
+       (λ ()
+         '()))))
 
   (define loop*
     (λ (c)
-      (((c loop*) kons) nill)))
+      (((c loop*)
+        (lambda (a)
+          (lambda (c)
+            (cons a (loop* c)))))
+       (λ () '()))))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
@@ -186,7 +189,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          ((sk a) fk)))))
+          ((sk a) (mzero))))))
 
   (define (mzero)
     (λ (dk)
@@ -201,32 +204,37 @@ Not _entirely_ sure I'm happy with the walk-ans-es
           (((m1
              (λ (c1^)
                (dk (mplus m2 c1^))))
-            sk)
+            (lambda (a)
+              (lambda (c)
+                ((sk a) (mplus c m2)))))
            (λ ()
              (((m2 dk) sk) fk)))))))
-  
-  (define ((map f) m)
-    (λ (dk)
-      (λ (sk)
-        (λ (fk)
-          (((m
-             (λ (m^)
-               (dk ((map f) m^)))) 
-            (λ (b)
-              (λ (fk)
-                ((sk (f b)) fk))))
-           fk)))))
 
-  (define (join mma)
+(define ((map f) m)
+  (λ (dk)
+     (λ (sk)
+        (λ (fk)
+           (((m
+              (λ (m^)
+		 (dk ((map f) m^))))
+             (λ (b)
+		(λ (c)
+		   ((sk (f b)) ((map f) c)))))
+            fk)))))
+
+  (define (join mm)
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          (((mma
+          (((mm
              (λ (mm^)
                (dk (join mm^))))
             (λ (mb)
-              (λ (fk)
-                (((mb dk) sk) fk))))
+              (λ (c)
+                ((((mplus mb (join c)) 
+                   dk)
+                  sk)
+                 fk))))
            fk)))))
 
   (define (return a)
@@ -244,9 +252,6 @@ Not _entirely_ sure I'm happy with the walk-ans-es
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
-  
-  (define kons (λ (a) (λ (fk) (cons a (fk)))))
-  (define nill (λ () '()))
 
   (define (loop n)
     (λ (c)
@@ -255,12 +260,19 @@ Not _entirely_ sure I'm happy with the walk-ans-es
            (if (zero? n)
                '()
                ((loop (sub1 n)) c^))))
-        kons)
-       nill)))
+        (lambda (a)
+          (lambda (c)
+            (cons a ((loop n) c)))))
+       (λ ()
+         '()))))
 
   (define loop*
     (λ (c)
-      (((c loop*) kons) nill)))
+      (((c loop*)
+        (lambda (a)
+          (lambda (c)
+            (cons a (loop* c)))))
+       (λ () '()))))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
@@ -270,17 +282,23 @@ Not _entirely_ sure I'm happy with the walk-ans-es
             (dk g))))))
 
   (define-syntax-rule (freeze e) 
-      (λ (dk)
-        (λ (sk)
-          (λ (fk)
-            (dk e)))))
+    (λ (dk)
+      (λ (sk)
+        (λ (fk)
+          (dk e)))))
 
   (define (return a)
     (λ (dk)
       (λ (sk)
         (λ (fk)
-          ((sk a) fk)))))
+          ((sk a) (mzero))))))
 
+;;  Is how to pick up the search after you find an answer the same as
+;; what you would have done with failure, or is that now something
+;; different? And if so, what?  Should we be returning a residual
+  ;; computation, and if so, how do we represent it.
+  ;;Maybe we should be calling lambda (dk) (sk ) fk (fk
+  
   (define ((bind m) f)
     (λ (dk)
       (λ (sk)
@@ -289,10 +307,9 @@ Not _entirely_ sure I'm happy with the walk-ans-es
              (λ (m^)
                (dk ((bind m^) f))))
             (λ (b)
-              (λ (fk)
-                ((((f b)
-                   (lambda (m^)
-                     (dk m^)))
+              (λ (c)
+                ((((mplus (f b) ((bind c) f))
+                   dk)
                   sk)
                  fk))))
            fk)))))
@@ -302,7 +319,19 @@ Not _entirely_ sure I'm happy with the walk-ans-es
       (λ (sk)
         (λ (fk)
           (fk)))))
-
+  
+  (define (mplus m1 m2)
+    (λ (dk)
+      (λ (sk)
+        (λ (fk)
+          (((m1
+             (λ (c1^)
+               (dk (mplus m2 c1^))))
+            (lambda (a)
+              (lambda (c)
+                ((sk a) (mplus c m2)))))
+           (λ ()
+             (((m2 dk) sk) fk)))))))
   ;; Cf b/c this has a recursion without the delay
   ;; faster-mk sytle definition of interleaving mplus (w/o delay,
   ;; interleave on every)
@@ -318,18 +347,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   ;;        (λ ()
   ;;          ((m2 sk)
   ;;           fk))))))
-
-  (define (mplus m1 m2)
-    (λ (dk)
-      (λ (sk)
-        (λ (fk)
-          (((m1
-             (λ (c1^)
-               (dk (mplus m2 c1^))))
-            sk)
-           (λ ()
-             (((m2 dk) sk) fk)))))))
-
+  
   (define (unit a)
     (return a))
 

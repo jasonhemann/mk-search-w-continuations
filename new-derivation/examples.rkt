@@ -59,8 +59,8 @@ program to demonstrate why it does.
 ;; Any one of these 4
 ;; (require (submod "mk-streams-derivation.rkt" streams-unit-map-join))
 ;; (require (submod "mk-streams-derivation.rkt" streams-bind-return))
-;; (require (submod "mk-streams-derivation.rkt" sk/fk-unit-map-join))
-(require (submod "mk-streams-derivation.rkt" sk/fk-bind-return))
+(require (submod "mk-streams-derivation.rkt" sk/fk-unit-map-join))
+;; (require (submod "mk-streams-derivation.rkt" sk/fk-bind-return))
 
 #| 
 
