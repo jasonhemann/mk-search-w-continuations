@@ -35,30 +35,35 @@ wanted?
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
-  
-  (define (walk-ans* c)
-    (cond
-      ((null? c) '())
-      ((cons? c) (cons (car c) (walk-ans* (cdr c))))
-      (else (loop* c))))
 
   (define (loop* c)
     (cond
-      ((promise? c) (loop* (force c)))
-      (else (walk-ans* c))))
-
-  (define ((walk-ans n) c)
-    (cond
       ((null? c) '())
-      ((cons? c) (cons (car c) ((walk-ans n) (cdr c))))
-      (else ((loop n) c))))
+      ((promise? c) (loop* (force c)))
+      ((cons? c) (cons (car c) (loop* (cdr c))))))
 
   (define ((loop n) c)
     (cond
+      ((null? c) '())
       ((promise? c)
-       (if (zero? n) '()
+       (if (zero? n)
+           '()
            ((loop (sub1 n)) (force c))))
-      (else ((walk-ans n) c))))
+      ((cons? c)
+       (cons (car c) ((loop n) (cdr c))))))
+  
+  ;; (define ((walk-ans n) c)
+  ;;   (cond
+  ;;     ((null? c) '())
+  ;;     ((cons? c) (cons (car c) ((walk-ans n) (cdr c))))
+  ;;     (else ((loop n) c))))
+
+  ;; (define ((loop n) c)
+  ;;   (cond
+  ;;     ((promise? c)
+  ;;      (if (zero? n) '()
+  ;;          ((loop (sub1 n)) (force c))))
+  ;;     (else ((walk-ans n) c))))
   
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
@@ -70,13 +75,13 @@ wanted?
   (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (join ((map f) (force m)))))
+      ((promise? m) (delay/name ((map f) (force m))))
       ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
   (define (join mma)
     (cond
-      ((null? mma) '())
-      ((promise? mma) mma)
+      ((null? mma) '()) 
+      ((promise? mma) (delay/name (join (force mma))))
       ((cons? mma) (mplus (car mma) (join (cdr mma))))))
 
   (define (mzero) '())
@@ -96,6 +101,7 @@ wanted?
 
 (module streams-bind-return racket
   (require (combine-in rackunit racket/promise))
+  (require racket/trace)
   (provide (all-defined-out))
 
   ;; Ugly external interface for cover
@@ -103,30 +109,22 @@ wanted?
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
-  
-  (define (walk-ans* c)
-    (cond
-      ((null? c) '())
-      ((cons? c) (cons (car c) (walk-ans* (cdr c))))
-      (else (loop* c))))
 
   (define (loop* c)
     (cond
-      ((promise? c) (loop* (force c)))
-      (else (walk-ans* c))))
-
-  (define ((walk-ans n) c)
-    (cond
       ((null? c) '())
-      ((cons? c) (cons (car c) ((walk-ans n) (cdr c))))
-      (else ((loop n) c))))
+      ((promise? c) (loop* (force c)))
+      ((cons? c) (cons (car c) (loop* (cdr c))))))
 
   (define ((loop n) c)
     (cond
+      ((null? c) '())
       ((promise? c)
-       (if (zero? n) '()
+       (if (zero? n)
+           '()
            ((loop (sub1 n)) (force c))))
-      (else ((walk-ans n) c))))
+      ((cons? c)
+       (cons (car c) ((loop n) (cdr c))))))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args) (delay/name g)))
@@ -168,13 +166,6 @@ wanted?
     (cond
       ((null? (cdr args)) (loop* (car args)))
       (else ((loop (car args)) (cadr args)))))
-
-  ;; (define ((walk-ans n) c)
-  ;;   (((c (loop (sub1 n)))
-  ;;     (lambda (a)
-  ;;       (lambda (c)
-  ;;         (cons a ((walk-ans n) c)))))
-  ;;    (lambda () '())))
   
   (define (loop n)
     (λ (c)
@@ -189,20 +180,16 @@ wanted?
        (λ ()
          '()))))
 
-  ;; (define (walk-ans* c)
-  ;;   (((c loop*)
-  ;;     (lambda (a)
-  ;;       (lambda (c)
-  ;;         (cons a (walk-ans* c)))))
-  ;;    (lambda () '())))
-  
   (define loop*
     (λ (c)
-      (((c loop*)
+      (((c
+         (λ (c^)
+           (loop* c^)))
         (λ (a)
           (λ (c)
             (cons a (loop* c)))))
-       (λ () '()))))
+       (λ ()
+         '()))))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
@@ -278,6 +265,7 @@ wanted?
 
 (module sk/fk-bind-return racket
   (require rackunit)
+  (require racket/trace)
   (provide (all-defined-out))
 
   (define (run . args)
@@ -300,11 +288,14 @@ wanted?
 
   (define loop*
     (λ (c)
-      (((c loop*)
+      (((c
+         (λ (c^)
+           (loop* c^)))
         (λ (a)
           (λ (c)
             (cons a (loop* c)))))
-       (λ () '()))))
+       (λ ()
+         '()))))
 
   (define-syntax-rule (define-relation (n . args) g)
     (define (n . args)
