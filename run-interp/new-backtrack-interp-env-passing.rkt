@@ -132,12 +132,12 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 
 (define (init-rel-env)
   (let ([h (make-immutable-hasheqv
-            `((a-cat . ,(cons 't `(== (param t) cat)))
-              (listo . ,(cons 'x `(disj (conj succeed succeed) (listo (param x)))))
-              (nevero . ,(cons 'x `(nevero)))
-              (doggo . ,(cons 't `(disj (== (param t) dog) (hoto (param t)))))
-              (hoto . ,(cons 't `(doggo (param t))))
-              (appendo . ,(cons 't `(fresh (a)
+            `((a-cat . ,(cons '(t) `(== (param t) cat)))
+              (listo . ,(cons '(x) `(disj (conj succeed succeed) (listo (param x)))))
+              (nevero . ,(cons '(x) `(nevero)))
+              (doggo . ,(cons '(t) `(disj (== (param t) dog) (hoto (param t)))))
+              (hoto . ,(cons '(t) `(doggo (param t))))
+              (appendo . ,(cons '(t) `(fresh (a)
                                        (fresh (d)
                                          (fresh (res)
                                            (conj (== (param t) ,(cons '(var a) (cons '(var d) '(var res))))
@@ -150,8 +150,8 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
                                                        (fresh (res2)
                                                          (conj (== (var res) ,(cons '(var a2) '(var res2)))
                                                                (appendo ,(cons '(var d2) (cons '(var d) '(var res2))))))))))))))))
-              (catso . ,(cons 't `(disj (== (param t) cat) (catso (param t)))))
-              (outero . ,(cons 't `(fresh (a)
+              (catso . ,(cons '(t) `(disj (== (param t) cat) (catso (param t)))))
+              (outero . ,(cons '(t) `(fresh (a)
                                       (fresh (d)
                                         (fresh (res)
                                           (conj (== (param t) ,(cons '(var a) (cons '(var d) '(var res))))
@@ -162,10 +162,10 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
                                                      (fresh (res2)
                                                        (conj (== (var res) ,(cons '(var a2) '(var res2)))
                                                              (innero ,(cons '(var d2) (cons '(var d) '(var res2)))))))))))))))
-              (innero . ,(cons 't `(fresh (a)
+              (innero . ,(cons '(t) `(fresh (a)
                                       (fresh (d)
                                         (fresh (res)
-                                          (conj (== (param t) ,(cons '(var a) (cons '(var d) '(var res))))
+                                           (conj (== (param t) ,(cons '(var a) (cons '(var d) '(var res))))
                                                 (conj (== () (var a)) (== (var d) (var res)))))))))))])
     (λ (y)
       (hash-ref h y (λ () (error 'init-rel-env "sadness ~s~n" y))))))
@@ -182,8 +182,13 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 (define (apply-lex-env le t)
   (cdr (assv t le)))
 
+
 (define (apply-param-env pe t)
-  (cdr (assv t pe)))
+  (match pe
+    [`((,y . ,ys) . (,v . ,vs))
+     (if (eqv? t y)
+         v
+         (apply-param-env (cons ys vs) t))]))
 
 (define (unify v w s)
   (cond
@@ -208,14 +213,14 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
            (mzero)))]
     [`(disj ,g1 ,g2) (mplus (ee g1 le pe re s vc) (ee g2 le pe re s vc))]
     [`(conj ,g1 ,g2) (bind (ee g1 le pe re s vc) (λ (s^ vc^) (ee g2 le pe re s^ vc^)))]
-    [`(,r ,expr2)
+    [`(,r . ,expr2s)
      ;; To evaluate a relation, we:
      ;; - evaluate the relname to a relbody and parameter
      ;; - evaluate the expression to a value.
      ;; - start a new environment with a mapping from that parameter to said value.
-     (match-let ([`(,param . ,body) (apply-rel-env re r)]
-                 [val (apply-param-and-lex-vars* expr2 le pe)])
-       (freeze (ee body '() `((,param . ,val)) re s vc)))])) 
+     (match-let ([`(,params . ,body) (apply-rel-env re r)]
+                 [vals (map (λ (e) (apply-param-and-lex-vars* e le pe)) expr2s)])
+       (freeze (ee body '() `(,params . ,vals) re s vc)))])) 
 
 (define-syntax-rule (freeze e) 
   (λ (dk sk fk)
@@ -262,9 +267,9 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 
 (module+ test
   (test-equal? "lookup a relation name in an initial env"
-    (match-let ([`(,param . ,body) (apply-rel-env (init-rel-env) 'a-cat)])
-      param)
-    't)
+    (match-let ([`(,params . ,body) (apply-rel-env (init-rel-env) 'a-cat)])
+      params)
+    '(t))
   (test-equal? "fail in initial env w/bs initial continuations works"
     (loop* (ee '(fail) '() '() (init-rel-env) '() 0))
     '())
@@ -341,10 +346,10 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
     (loop* (ee '(fresh (x) (a-cat (var x))) '() '() (init-rel-env) '() 0))
     '(((0 . cat))))
   (test-equal? "relation call on half a body of a recursive relation"
-    (loop 3 (ee `(catso (param t)) '() `((t . 0)) (init-rel-env) '() 1))
+    (loop 3 (ee `(catso (param t)) '() `((t) . (0)) (init-rel-env) '() 1))
     '(((0 . cat)) ((0 . cat)) ((0 . cat))))
   (test-equal? "relation call on body of this relation 1 extra ans b/c no delay"
-    (loop 3 (ee `(disj (== (param t) cat) (catso (param t))) '() `((t . 0)) (init-rel-env) '() 1))
+    (loop 3 (ee `(disj (== (param t) cat) (catso (param t))) '() `((t) . (0)) (init-rel-env) '() 1))
     '(((0 . cat)) ((0 . cat)) ((0 . cat)) ((0 . cat))))
   (test-equal? "relation call on a recursive relation"
     (loop 3 (ee `(catso (var x)) '((x . 0)) '() (init-rel-env) '() 1))
