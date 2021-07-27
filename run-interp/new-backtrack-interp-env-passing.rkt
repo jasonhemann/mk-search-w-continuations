@@ -270,9 +270,9 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 
 (module+ test
   (test-equal? "lookup a relation name in an initial env"
-             (match-let ([`(,param . ,body) (apply-rel-env (init-rel-env) 'a-cat)])
-               param)
-             't)
+    (match-let ([`(,param . ,body) (apply-rel-env (init-rel-env) 'a-cat)])
+      param)
+    't)
   (test-equal? "fail in initial env w/bs initial continuations works"
     (loop* (ee '(fail) '() '() (init-rel-env) '() 0))
     '())
@@ -296,11 +296,9 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
             '()))))))
 
   (test-equal?
-   "test walk w/o logic vars or params"
-   (walk
-    '0
-    '((1 . 0)))
-   '0)
+    "test walk w/o logic vars or params"
+    (walk '0 '((1 . 0)))
+    '0)
   
   (test-equal? "fresh x over success in initial env returns correct var count value, too"
     (new-loop* (ee '(fresh (x) (succeed)) '() '() (init-rel-env) '() 0))
