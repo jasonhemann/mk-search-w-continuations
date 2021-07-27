@@ -208,12 +208,10 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
     [`(fail)          (mzero)]
     [`(fresh (,v) ,g) (ee g (extend-lexical-env v vc le) pe re s (add1 vc))]
     [`(== ,t1 ,t2)
-     (let ([t1 (apply-param-and-lex-vars* t1 le pe)]
-           [t2 (apply-param-and-lex-vars* t2 le pe)])
-      (let ([res (unify (walk t1 s) (walk t2 s) le pe s)])
-        (if res
-            (return res vc)
-            (mzero))))]
+     (let ([res (unify (walk (apply-param-and-lex-vars* t1 le pe) s) (walk (apply-param-and-lex-vars* t2 le pe) s) le pe s)])
+       (if res
+           (return res vc)
+           (mzero)))]
     [`(disj ,g1 ,g2) (mplus (ee g1 le pe re s vc) (ee g2 le pe re s vc))]
     [`(conj ,g1 ,g2) (bind (ee g1 le pe re s vc) (λ (s^ vc^) (ee g2 le pe re s^ vc^)))]
     [`(,r ,expr2)
