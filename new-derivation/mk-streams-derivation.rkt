@@ -304,6 +304,7 @@ wanted?
           (λ (fk)
             (dk g))))))
 
+  ;; not an essential operator
   (define-syntax-rule (freeze e) 
     (λ (dk)
       (λ (sk)
@@ -375,5 +376,6 @@ wanted?
   (define (join z)
     ((bind z) (λ (a) a)))
   )
+
 
 
