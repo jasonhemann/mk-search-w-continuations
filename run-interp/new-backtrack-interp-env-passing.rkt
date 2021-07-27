@@ -77,24 +77,18 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 (define (ext-s x v s)
   (cons `(,x . ,v) s))
 
-;; v comes in walked
+;; v comes in walked, but not walk*ed
 (define (ext-s-check x v le pe s)
-  (cond
-    [(doesnt-occur? x v le pe s)
-     => (λ (v^) (ext-s x v^ s))]
-    [else #f]))
+  (and (doesnt-occur? x v le pe s) (ext-s x v s)))
 
-;; To reiterate, this assumes 
+;; Does not bring the substitution up to date.
 (define (doesnt-occur? x v le pe s)
   (cond
-    [(logic-var? v) (and (not (same-logic-var? v x)) v)] ;; if it occurs, return #t, else return v. 
+    [(logic-var? v) (not (same-logic-var? v x))] ;; if it occurs, return #t, else return v. 
     [(pair? v)
-     (let ([res-a (doesnt-occur? x (walk (car v) s) le pe s)])
-       (and res-a
-            (let ([res-d (doesnt-occur? x (walk (cdr v) s) le pe s)])
-              (and res-d
-                   `(,res-a . ,res-d)))))]
-    [else v]))
+     (and (doesnt-occur? x (walk (car v) s) le pe s)
+          (doesnt-occur? x (walk (cdr v) s) le pe s))]
+    [else #t]))
 
 (define empty-s '())
 (define init-vc 0)
@@ -391,13 +385,13 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
        (12 . 15)
        (14 c d)
        (13)
-       (9 b . 12)
+       (9 10 . 12)
        (11)
        (10 . b)
        (6 . 9)
        (8 c d)
        (7 b)
-       (3 a . 6)
+       (3 4 . 6)
        (5 b)
        (4 . a)
        (0 . 3)
