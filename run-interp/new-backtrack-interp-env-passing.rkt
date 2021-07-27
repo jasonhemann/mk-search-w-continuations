@@ -78,16 +78,16 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
   (cons `(,x . ,v) s))
 
 ;; v comes in walked, but not walk*ed
-(define (ext-s-check x v le pe s)
-  (and (doesnt-occur? x v le pe s) (ext-s x v s)))
+(define (ext-s-check x v s)
+  (and (doesnt-occur? x v s) (ext-s x v s)))
 
 ;; Does not bring the substitution up to date.
-(define (doesnt-occur? x v le pe s)
+(define (doesnt-occur? x v s)
   (cond
     [(logic-var? v) (not (same-logic-var? v x))] ;; if it occurs, return #t, else return v. 
     [(pair? v)
-     (and (doesnt-occur? x (walk (car v) s) le pe s)
-          (doesnt-occur? x (walk (cdr v) s) le pe s))]
+     (and (doesnt-occur? x (walk (car v) s) s)
+          (doesnt-occur? x (walk (cdr v) s) s))]
     [else #t]))
 
 (define empty-s '())
@@ -185,14 +185,14 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 (define (apply-param-env pe t)
   (cdr (assv t pe)))
 
-(define (unify v w le pe s)
+(define (unify v w s)
   (cond
     [(same-logic-var? v w) s]
-    [(logic-var? v) (ext-s-check v w le pe s)]
-    [(logic-var? w) (ext-s-check w v le pe s)]
+    [(logic-var? v) (ext-s-check v w s)]
+    [(logic-var? w) (ext-s-check w v s)]
     [(and (pair? v) (pair? w))
-     (let ([s (unify (walk (car v) s) (walk (car w) s) le pe s)])
-       (and s (unify (walk (cdr v) s) (walk (cdr w) s) le pe s)))]
+     (let ([s (unify (walk (car v) s) (walk (car w) s) s)])
+       (and s (unify (walk (cdr v) s) (walk (cdr w) s) s)))]
     [(equal? v w) s]
     [else #f]))
 
@@ -202,7 +202,7 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
     [`(fail)          (mzero)]
     [`(fresh (,v) ,g) (ee g (extend-lexical-env v vc le) pe re s (add1 vc))]
     [`(== ,t1 ,t2)
-     (let ([res (unify (walk (apply-param-and-lex-vars* t1 le pe) s) (walk (apply-param-and-lex-vars* t2 le pe) s) le pe s)])
+     (let ([res (unify (walk (apply-param-and-lex-vars* t1 le pe) s) (walk (apply-param-and-lex-vars* t2 le pe) s) s)])
        (if res
            (return res vc)
            (mzero)))]
