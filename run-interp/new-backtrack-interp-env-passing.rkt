@@ -6,8 +6,8 @@
 ;; If and when this proves insufficiently fast:
 
 ;; Turn the relation parameters into peano numbers representing offsets in the relation actual parameters list, look up by recurring on both.
-;; Maybe keep the next or current var count, whichever is best, as offsets from a list index of plus base value.
 
+;; Maybe keep the next or current var count, whichever is best, as some kind of offsets from a list index of plus base value.
 
 
 #| 
@@ -64,7 +64,6 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 (define (walk v s)
   (let ([a (and (logic-var? v) (assv v s))])
     (if a (walk (cdr a) s) v)))
-
 
 (define (apply-param-and-lex-vars* t le pe)
   (match t
@@ -174,10 +173,18 @@ Wand & Vallaincourt "Relating Models of Backtracking" https://dl.acm.org/doi/pdf
 
 (define (extend-lexical-env x a env) (cons (cons x a) env))
 
-;; Presently, since we have kludged the logic var environment and the
-;; relation environment into one, if some goofball uses a relation
-;; name as a local variable, instead of an unbound identifier, we'll
-;; drop in the relation definition
+
+;; Contemplating: we could use this together with a
+;; different representation of the logic variable environment
+;; to do var lookup
+
+;; '((e . 5) (d . 4) (c . 3) (b . 2) (a . 1))
+;; next var count was 1 when we entered this relation, now its 6
+
+(define (find-var-id x ls nvc)
+  (cond
+    ((eqv? x (car ls)) nvc)
+    (else (find-var-id x (sub1 nvc) (cdr ls)))))
 
 (define (apply-lex-env le t)
   (cdr (assv t le)))
