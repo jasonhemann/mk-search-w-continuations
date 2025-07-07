@@ -739,6 +739,12 @@ in of
 
 This approach is supported by multiple lines of prior work. Danvy et al. (2002) explicitly derive a family of monadic semantics for backtracking and show that a list-based evaluator and a continuation-based evaluator are equivalent and inter-derivable. Wand \& Vaillancourt go further in proving that, for a typed functional language with backtracking, the stream and two-continuation semantics produce identically observable results (they are adequate for each other). On the implementation side, Kiselyov et al. (2005) demonstrate how to implement fair search in both stream and continuation models, highlighting that what one model does with eager list operations, the other can simulate with a combination of continuations and control operations. There are also more recent efforts, like Shin-Cheng Mu’s calculational derivation of a backtracking algorithm, which show how one can start from a high-level monadic definition and, through algebraic manipulation, arrive at an efficient backtracking procedure. These works collectively reinforce the idea that multiple-continuation semantics are not some ad-hoc invention, but rather a systematically derivable implementation of a high-level logic specification.
 
+There are a variety of other works that describe or relate to using CPS with double-barreled continuations:
+
+% https://www.ccs.neu.edu/home/shivers/papers/ordered-cont.pdf - Shivers Ordered Continuations
+% https://dl.acm.org/doi/pdf/10.1145/1291151.1291179 Kennedy good section on extending to multiple continuations
+% https://link.springer.com/article/10.1023/A:1020887011500
+
 
 % \section{Conclusions}\label{sec:conclusions}
 
