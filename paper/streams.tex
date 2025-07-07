@@ -96,7 +96,8 @@
 \usepackage{xpatch} %% for etoolbox w/biblatex
 \usepackage{minted} %% My brand new baby for highlighting source code
 %% also adds \begin{framed} environment
-\usepackage{mathpartir} %% Didier Remy's typesetting for proofs. 
+\usepackage{mathpartir} %% Didier Remy's typesetting for proofs.
+\usepackage{semantic}
 \usepackage[strict,autostyle]{csquotes} %% enquote &c that doesn't interfere w/cdlatex usage http://ftp.lyx.org/pub/tex-archive/macros/latex/contrib/csquotes/csquotes.pdf
 \usepackage[xspace]{ellipsis} %% http://tex.stackexchange.com/questions/73467/what-is-best-method-to-insert-an-ellipsis-in-a-xetex-document#73469
 \usepackage{pseudocode}
@@ -226,10 +227,10 @@ to guide their compilation of goal-oriented languages. But
 \citeauthor{danvy2002unifying} perhaps give themselves too little
 credit; the interrelationships they observe are less straightforward
 than they might first appear to the casual reader. These additional
-subtleties become more obvious when we extend the relationship to link
-in an eager language a stream datatype with eager and lazy
-constructors to its continuation-based variant. These complexities
-appear more obvious still when we add interleaving.
+subtleties become more obvious when we extend the relationship to
+link, in an eager language, a stream datatype with eager and lazy
+constructors with its continuation-based variant. These subtleties
+compound when we add \enquote{interleaving}.
 
 \begin{listing}
 \begin{minted}[autogobble,stripall,linenos]{ml}
@@ -241,15 +242,15 @@ datatype 'a stream = End | More of 'a * (1 -> 'a stream)
 \end{listing}
 
 The \mintinline{ml}|stream| datatype we define in
-\cref{mnt:eager-lazy-datatypes}, unlike the \mintinline{ml}|list| datatype,
-demands a thunk as the second argument to the \mintinline{ml}|More|
-constructor, to delay evaluation. We could have instead appealed to
-lazy constructors (e.g. \mintinline{ml}|lazy|) or retreated to a lazy
-host language. Those alternative choices, however, bury the
-relationship we want to further explore.
+\cref{mnt:eager-lazy-datatypes}, unlike the \mintinline{ml}|list|
+datatype, demands a thunk as the second argument to the
+\mintinline{ml}|More| constructor, to delay evaluation. We could have
+instead appealed to lazy constructors (e.g. \mintinline{ml}|lazy|) or
+retreated to a lazy host language. Those alternative choices, however,
+bury the relationship we want to explore further.
 
-The streams of \cref{mnt:eager-lazy-datatypes} are
-odd. \citeauthor{wadler1998add}, in \citetitle{wadler1998add},
+\cref{mnt:eager-lazy-datatypes} presents some odd
+streams. \citeauthor{wadler1998add}, in \citetitle{wadler1998add},
 classify implementations of lazy stream datatypes in an eager host
 language as either \enquote{even} or \enquote{odd}. Those names
 reflect both the number of \rackinline|cons|es in the streams they
@@ -283,10 +284,10 @@ memoization wastes resources. This situation is not contrived: the
 Racket language~\cite{flatt2010reference} has a built-in construct
 \rackinline|delay/name| just for such situations. Unlike other
 definitions of streams, we can place \rackinline|delay|s precisely
-where they are necessary, and nowhere else. Further, since delays are
-now optional instead of mandatory, the delays can then double also as
-markers for the positions in which to interleave when combining two
-streams.
+where they are necessary, and nowhere else. Since these delay's
+placements are now fully the stream creator's decision, we can opt to
+use the delays as markers for the interleave positions when combining
+two streams.
 
 \begin{listing}
 \begin{minted}[autogobble,stripall,linenos]{ml}
@@ -343,32 +344,355 @@ standard, CS101 first-order representation of
 in of
 
 
- τ List                                                                  ≡                                        Nil                                              Cons of (τ × τ List)                            
-                                                                         abstract over tail                                                                        new type, new constructors                      
- τ HList =_df τ List → τ List                                            ≡                                        λl.l : τ HList                                   λl.Kons of (τ x l) : τ HList                    
-                                                                         curry Kons                                                                                                                                
- τ HList                                                                 ≡                                        λl.l : τ HList                                   λl.((cKons of τ) l) : τ HList                   
-                                                                         Church encode (abstract over selector)                                                    new type, new constructors                      
- τ CList =_df (τ → τ HList) → τ HList                                    ≡                                        Nul \= λsc.λl.l : τ CList                        Qons x \= λsc.λl.(sc x) l : τ CList             
-                                                                                                                                                                   where Qons : τ → τ CList                        
+ % τ List                                                                  ≡                                        Nil                                              Cons of (τ × τ List)                            
+ %                                                                         abstract over tail                                                                        new type, new constructors                      
+ % τ HList =_df τ List → τ List                                            ≡                                        λl.l : τ HList                                   λl.Kons of (τ x l) : τ HList                    
+ %                                                                         curry Kons                                                                                                                                
+ % τ HList                                                                 ≡                                        λl.l : τ HList                                   λl.((cKons of τ) l) : τ HList                   
+ %                                                                         Church encode (abstract over selector)                                                    new type, new constructors                      
+ % τ CList =_df (τ → τ HList) → τ HList                                    ≡                                        Nul \= λsc.λl.l : τ CList                        Qons x \= λsc.λl.(sc x) l : τ CList             
+ %                                                                                                                                                                   where Qons : τ → τ CList                        
                                                                                                                                                                                                                    
-                                                                                                                  Unchanged from above                             NonIn x xs \= λsc.λl.(sc x) xs : τ CList        
-                                                                                                                                                                   Unchanged from above                            
-                                                                         α  equivalent to                                                                                                                          
-                                                                         ≡                                        Nul \=  λk.λl.l : τ CList                        Qons x \= λk.λl.((k x) l)  : τ CList            
-                                                                                                                  true just b/c λl.l : τ HList                     Here l ηs away                                  
- τ (τ HList) C =_df (τ → τ HList) → τ HList                                                                       Nul \=  λk.λl.l : τ (τ HList) C                  Qons x \= λk.λl.((k x) l)  : τ (τ HList) C      
-                                                                         an instance of the more general                                                                                                           
- τ (σ HList) C =_df (τ → σ HList) → σ HList                                                                       Uniformly change the type                        Uniformly change the type                       
-                                                                         an instance of the more general                                                                                                           
- τ (σ List → σ List) C =_df (τ → (σ List → σ List)) → (σ List → σ List)                                           Uniformly change the type                        Uniformly change the type                       
-                                                                         an instance of the more general                                                                                                           
- τ (δ → δ) C =_df (τ → (δ → δ)) → (δ → δ)                                                                         Uniformly change the type                        Uniformly change the type                       
-                                                                         an instance of the more general                                                                                                           
- τ γ C =_df (τ → γ) → γ for answer type γ                                                                         This type is too general for these two programs  This type is too general for these two programs 
-                                                                         which notationally we normally elide as                                                                                                   
- τ C =_df (τ → γ) → γ for answer type γ                                                                                                                                                                            
+ %                                                                                                                  Unchanged from above                             NonIn x xs \= λsc.λl.(sc x) xs : τ CList        
+ %                                                                                                                                                                   Unchanged from above                            
+ %                                                                         α  equivalent to                                                                                                                          
+ %                                                                         ≡                                        Nul \=  λk.λl.l : τ CList                        Qons x \= λk.λl.((k x) l)  : τ CList            
+ %                                                                                                                  true just b/c λl.l : τ HList                     Here l ηs away                                  
+ % τ (τ HList) C =_df (τ → τ HList) → τ HList                                                                       Nul \=  λk.λl.l : τ (τ HList) C                  Qons x \= λk.λl.((k x) l)  : τ (τ HList) C      
+ %                                                                         an instance of the more general                                                                                                           
+ % τ (σ HList) C =_df (τ → σ HList) → σ HList                                                                       Uniformly change the type                        Uniformly change the type                       
+ %                                                                         an instance of the more general                                                                                                           
+ % τ (σ List → σ List) C =_df (τ → (σ List → σ List)) → (σ List → σ List)                                           Uniformly change the type                        Uniformly change the type                       
+ %                                                                         an instance of the more general                                                                                                           
+ % τ (δ → δ) C =_df (τ → (δ → δ)) → (δ → δ)                                                                         Uniformly change the type                        Uniformly change the type                       
+ %                                                                         an instance of the more general                                                                                                           
+ % τ γ C =_df (τ → γ) → γ for answer type γ                                                                         This type is too general for these two programs  This type is too general for these two programs 
+ %                                                                         which notationally we normally elide as                                                                                                   
+ % τ C =_df (τ → γ) → γ for answer type γ                                                                                                                                                                            
 
+\begin{listing}
+\begin{minted}[fontsize=\footnotesize,autogobble,stripall,linenos]{racket}
+(define (run . args)
+  (cond
+    ((null? (cdr args)) (loop* (car args)))
+    (else ((loop (car args)) (cadr args)))))
+
+(define (loop* c)
+  (cond
+    ((null? c) '())
+    ((promise? c) (loop* (force c)))
+    ((cons? c) (cons (car c) (loop* (cdr c))))))
+
+(define ((loop n) c)
+  (cond
+    ((null? c) '())
+    ((promise? c)
+     (if (zero? n)
+         '()
+         ((loop (sub1 n)) (force c))))
+    ((cons? c)
+     (cons (car c) ((loop n) (cdr c))))))
+
+;; We cannot support, right now, a split model w/ one 
+;; operation that *just* does the pull and calls to 
+;; a subroutine to walk til the ends
+
+(define-syntax-rule (define-relation (n . args) g)
+  (define (n . args) (delay/name g)))
+
+(define-syntax-rule (freeze e) (delay/name e))
+
+(define (unit a) (list a))
+
+(define ((map f) m)
+  (cond
+    ((null? m) '())
+    ((promise? m) (delay/name ((map f) (force m))))
+    ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
+
+(define (join mma)
+  (cond
+    ((null? mma) '()) 
+    ((promise? mma) (delay/name (join (force mma))))
+    ((cons? mma) (mplus (car mma) (join (cdr mma))))))
+
+(define (mzero) '())
+
+(define (mplus m1 m2)
+  (cond
+    ((null? m1) m2)
+    ((promise? m1) (delay/name (mplus m2 (force m1))))
+    ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
+
+(define (return a)
+  (unit a))
+
+(define ((bind m) f)
+  (join ((map f) m)))
+\end{minted}
+\end{listing}
+
+
+\begin{listing}
+\begin{minted}[fontsize=\footnotesize,autogobble,stripall,linenos]{racket}
+;; Ugly external interface for cover
+(define (run . args)
+  (cond
+    ((null? (cdr args)) (loop* (car args)))
+    (else ((loop (car args)) (cadr args)))))
+
+(define (loop* c)
+  (cond
+    ((null? c) '())
+    ((promise? c) (loop* (force c)))
+    ((cons? c) (cons (car c) (loop* (cdr c))))))
+
+(define ((loop n) c)
+  (cond
+    ((null? c) '())
+    ((promise? c)
+     (if (zero? n)
+         '()
+         ((loop (sub1 n)) (force c))))
+    ((cons? c)
+     (cons (car c) ((loop n) (cdr c))))))
+
+(define-syntax-rule (define-relation (n . args) g)
+  (define (n . args) (delay/name g)))
+
+(define-syntax-rule (freeze e) (delay/name e))
+
+(define (return a) (cons a '()))
+
+(define (mzero) '())
+
+(define ((bind m) f)
+  (cond
+    ((null? m) '())
+    ((promise? m) (delay/name ((bind (force m)) f)))
+    ((cons? m) (mplus (f (car m)) ((bind (cdr m)) f)))))
+
+(define (mplus m1 m2)
+  (cond
+    ((null? m1) m2)
+    ((promise? m1) (delay/name (mplus m2 (force m1))))
+    ((cons? m1) (cons (car m1) (mplus (cdr m1) m2)))))
+
+(define (unit a)
+  (return a))
+
+(define ((map f) m)
+  ((bind m) (λ (a) (unit (f a)))))
+
+(define (join z)
+  ((bind z) (λ (a) a)))
+\end{minted}
+\end{listing}
+
+
+\begin{listing}
+\begin{minted}[fontsize=\footnotesize,autogobble,stripall,linenos]{racket}
+(define (run . args)
+  (cond
+    ((null? (cdr args)) (loop* (car args)))
+    (else ((loop (car args)) (cadr args)))))
+
+(define (loop n)
+  (λ (c)
+    (((c
+       (λ (c^)
+         (if (zero? n)
+             '()
+             ((loop (sub1 n)) c^))))
+      (λ (a)
+        (λ (c)
+          (cons a ((loop n) c)))))
+     (λ ()
+       '()))))
+
+(define loop*
+  (λ (c)
+    (((c
+       (λ (c^)
+         (loop* c^)))
+      (λ (a)
+        (λ (c)
+          (cons a (loop* c)))))
+     (λ ()
+       '()))))
+
+(define-syntax-rule (define-relation (n . args) g)
+  (define (n . args)
+    (λ (dk)
+      (λ (sk)
+        (λ (fk)
+          (dk g))))))
+
+(define-syntax-rule (freeze e) 
+    (λ (dk)
+      (λ (sk)
+        (λ (fk)
+          (dk e)))))
+
+(define (unit a)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        ((sk a) (mzero))))))
+
+(define (mzero)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (fk)))))
+
+(define (mplus m1 m2)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (((m1
+           (λ (c1^)
+             (dk (mplus m2 c1^))))
+          (λ (a)
+            (λ (c)
+              ((sk a) (mplus c m2)))))
+         (λ ()
+           (((m2 dk) sk) fk)))))))
+
+(define ((map f) m)
+(λ (dk)
+   (λ (sk)
+      (λ (fk)
+         (((m
+            (λ (m^)
+               (dk ((map f) m^))))
+           (λ (b)
+              (λ (c)
+                 ((sk (f b)) ((map f) c)))))
+          fk)))))
+
+(define (join mm)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (((mm
+           (λ (mm^)
+             (dk (join mm^))))
+          (λ (mb)
+            (λ (c)
+              ((((mplus mb (join c)) 
+                 dk)
+                sk)
+               fk))))
+         fk)))))
+
+(define (return a)
+  (unit a))
+
+(define ((bind m) f)
+  (join ((map f) m)))
+\end{minted}
+\end{listing}
+
+
+\begin{listing}
+\begin{minted}[fontsize=\footnotesize,autogobble,stripall,linenos]{racket}
+(define (run . args)
+  (cond
+    ((null? (cdr args)) (loop* (car args)))
+    (else ((loop (car args)) (cadr args)))))
+
+(define (loop n)
+  (λ (c)
+    (((c
+       (λ (c^)
+         (if (zero? n)
+             '()
+             ((loop (sub1 n)) c^))))
+      (λ (a)
+        (λ (c)
+          (cons a ((loop n) c)))))
+     (λ ()
+       '()))))
+
+(define loop*
+  (λ (c)
+    (((c
+       (λ (c^)
+         (loop* c^)))
+      (λ (a)
+        (λ (c)
+          (cons a (loop* c)))))
+     (λ ()
+       '()))))
+
+(define-syntax-rule (define-relation (n . args) g)
+  (define (n . args)
+    (λ (dk)
+      (λ (sk)
+        (λ (fk)
+          (dk g))))))
+
+;; not an essential operator
+(define-syntax-rule (freeze e) 
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (dk e)))))
+
+(define (return a)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        ((sk a) (mzero))))))
+
+(define ((bind m) f)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (((m
+           (λ (m^)
+             (dk ((bind m^) f))))
+          (λ (b)
+            (λ (c)
+              ((((mplus (f b) ((bind c) f))
+                 dk)
+                sk)
+               fk))))
+         fk)))))
+
+(define (mzero)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (fk)))))
+
+(define (mplus m1 m2)
+  (λ (dk)
+    (λ (sk)
+      (λ (fk)
+        (((m1
+           (λ (c1^)
+             (dk (mplus m2 c1^))))
+          (λ (a)
+            (λ (c)
+              ((sk a) (mplus c m2)))))
+         (λ ()
+           (((m2 dk) sk) fk)))))))
+
+(define (unit a)
+  (return a))
+
+(define ((map f) m)
+  ((bind m) (λ (a) (unit (f a)))))
+
+(define (join z)
+  ((bind z) (λ (a) a)))
+\end{minted}
+\end{listing}
+
+
+ 
 % Wadler even odd. Even *odder* streams.
 
 % Their connection via Danvy to the multi continuation delimited control
@@ -412,6 +736,8 @@ in of
 % \todo{Run}
 
 % \section{Related}\label{sec:related}
+
+This approach is supported by multiple lines of prior work. Danvy et al. (2002) explicitly derive a family of monadic semantics for backtracking and show that a list-based evaluator and a continuation-based evaluator are equivalent and inter-derivable. Wand \& Vaillancourt go further in proving that, for a typed functional language with backtracking, the stream and two-continuation semantics produce identically observable results (they are adequate for each other). On the implementation side, Kiselyov et al. (2005) demonstrate how to implement fair search in both stream and continuation models, highlighting that what one model does with eager list operations, the other can simulate with a combination of continuations and control operations. There are also more recent efforts, like Shin-Cheng Mu’s calculational derivation of a backtracking algorithm, which show how one can start from a high-level monadic definition and, through algebraic manipulation, arrive at an efficient backtracking procedure. These works collectively reinforce the idea that multiple-continuation semantics are not some ad-hoc invention, but rather a systematically derivable implementation of a high-level logic specification.
 
 
 % \section{Conclusions}\label{sec:conclusions}
