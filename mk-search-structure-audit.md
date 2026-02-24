@@ -22,7 +22,7 @@ This audit excludes all PDF contents and excludes backup/editor/build artifacts.
 
 ### Low-weight files (historical context)
 - `/Users/jhemann/Documents/mk-search-w-continuations/old-mk-cps/research-story.txt`
-- `/Users/jhemann/Documents/mk-search-w-continuations/old-mk-cps/changes-in-m-j-w-d-versions.txt`
+- `/Users/jhemann/Documents/mk-search-w-continuations/archive/three-continuation-derivation/README.md`
 - `/Users/jhemann/Documents/mk-search-w-continuations/old-mk-cps/dir-listing-work-order.txt`
 
 ## Deprecation-aware map (current)

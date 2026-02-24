@@ -1,5 +1,16 @@
 3k microKanren Internals Research
 
+Note (2026-02-24): many files named in this narrative were moved into
+purpose-named archive directories:
+- `map-join-with-dan*` and `map-join-3-k.rkt` ->
+  `/Users/jhemann/Documents/mk-search-w-continuations/archive/three-continuation-derivation/`
+- `map-join-xform*` ->
+  `/Users/jhemann/Documents/mk-search-w-continuations/archive/map-join-transformations/`
+- `a9-skmonads/map-join-xform-other-monad*` ->
+  `/Users/jhemann/Documents/mk-search-w-continuations/archive/defunctionalized-dispatch-experiments/`
+- `a9-skmonads2/micro-ks*` ->
+  `/Users/jhemann/Documents/mk-search-w-continuations/archive/micro-language-3k-derivation/`
+
 This research began in the shadow of some earlier but failed work at
 attempting to implement a microKanren in Idris. I'd wanted to prove a
 whole bunch of the properties needed for showing termination of the
@@ -136,5 +147,4 @@ to try and derive my way in the `a9-skmonads2/micro-ks-X` files to the
 three continuation model via CPSing the two-k version somehow into the
 3 k version that I want. I wasn't exactly sure how to do it and how to
 get there, and that's about where I got stopped.
-
 

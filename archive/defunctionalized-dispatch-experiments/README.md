@@ -1,4 +1,4 @@
-# a9-skmonads Branch
+# Defunctionalized Dispatch Experiments (formerly `a9-skmonads`)
 
 ## Development
 
@@ -16,7 +16,7 @@ computation/continuation constructors and apply-dispatch patterns.
 - primary narrative:
   `/Users/jhemann/Documents/mk-search-w-continuations/old-mk-cps/research-story.txt`
 - related but distinct from:
-  `/Users/jhemann/Documents/mk-search-w-continuations/archive/micro-ks/`
+  `/Users/jhemann/Documents/mk-search-w-continuations/archive/micro-language-3k-derivation/`
 
 ## Status
 

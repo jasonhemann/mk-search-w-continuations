@@ -1,4 +1,4 @@
-# map-join-xform Branch
+# Map/Join Transformations (formerly `map-join-xform`)
 
 ## Development
 
@@ -16,7 +16,7 @@ direct definitions toward transformed/CPS-flavored forms.
 - primary narrative:
   `/Users/jhemann/Documents/mk-search-w-continuations/old-mk-cps/research-story.txt`
 
-This branch overlaps conceptually with `archive/a9-skmonads/`, but is a
+This branch overlaps conceptually with `archive/defunctionalized-dispatch-experiments/`, but is a
 smaller, earlier track.
 
 ## Status

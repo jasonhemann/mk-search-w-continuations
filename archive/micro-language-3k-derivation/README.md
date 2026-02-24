@@ -1,4 +1,4 @@
-# micro-ks Branch (`a9-skmonads2`)
+# Micro-Language 3k Derivation (formerly `micro-ks` in `a9-skmonads2`)
 
 ## Development
 
