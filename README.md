@@ -6,6 +6,7 @@
 
 -  First read this README documentation.
 -  Then, read `./old-mk-cps/research-story.txt`
+-  For legacy CPS branches, read `./archive/README.md`
 -  Then, read `Church-encoding-lists-and-streams.org`
 -  Then, read `./reading-danvy-again.org`
 -  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`, and simultaneously with these

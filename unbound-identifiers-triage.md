@@ -6,7 +6,7 @@ This triage is based on a repo-wide compile sweep using `raco make` over all `*.
 
 ## Fixed in this change
 
-- File: `old-mk-cps/a9-skmonads/map-join-xform-other-monad-4.rkt`
+- File: `archive/a9-skmonads/map-join-xform-other-monad-4.rkt`
 - Location: line 39
 - Identifier previously reported unbound: `dk^`
 - Fix: corrected `match` quasiquote binder pattern from `` `(loop-base-dk dk^ sk fk) `` to `` `(loop-base-dk ,dk^ ,sk ,fk) `` so symbols are bound rather than matched literally.
@@ -26,10 +26,10 @@ This triage is based on a repo-wide compile sweep using `raco make` over all `*.
 | `sk-fk-from-double-cps/deep-remove-first-1.rkt` | 95 | `sk` | historical-experimental | Treat as derivation scratch; either define/rename continuations consistently or move non-runnable fragment into comments. |
 | `new-derivation/shallow-monadic-interp-1.rkt` | 74 | `bind` | incomplete/stub | Complete the partially written expression with concrete continuation arguments and intended binder. |
 | `old-mk-cps/test-monads.rkt` | 4 | `writer-log` | requires intent | Align callsite with `monads-struct.rkt` API (`writer` struct accessors or `run-writer`) and pick one canonical writer test style. |
-| `old-mk-cps/a9-skmonads/map-join-xform-other-monad-4d.rkt` | 48 | `c` | historical-experimental | Inspect intended continuation parameter threading; add missing binder or rename to existing in-scope variable. |
-| `old-mk-cps/a9-skmonads/map-join-xform-other-monad-4.rkt` | 73 | `<n>` | incomplete/stub | Replace/remove placeholder top-level probe call (`<n>`, `<exp>`, `<dk>`, `<sk>`, `<fk>`, `<k>`) once intended invocation is specified. |
-| `old-mk-cps/a9-skmonads2/micro-ks-3.rkt` | 49 | `sk` | incomplete/stub | Replace free `sk/fk/dk` with explicit parameters in `init-dk` or lexical bindings. |
+| `archive/a9-skmonads/map-join-xform-other-monad-4d.rkt` | 48 | `c` | historical-experimental | Inspect intended continuation parameter threading; add missing binder or rename to existing in-scope variable. |
+| `archive/a9-skmonads/map-join-xform-other-monad-4.rkt` | 73 | `<n>` | incomplete/stub | Replace/remove placeholder top-level probe call (`<n>`, `<exp>`, `<dk>`, `<sk>`, `<fk>`, `<k>`) once intended invocation is specified. |
+| `archive/micro-ks/micro-ks-3.rkt` | 49 | `sk` | incomplete/stub | Replace free `sk/fk/dk` with explicit parameters in `init-dk` or lexical bindings. |
 | `old-mk-cps/two-k-test.rkt` | 8 | `a?` | requires intent | Choose/define intended discriminator predicate for answer-vs-failure payload. |
-| `old-mk-cps/map-join-xform-other-monad.rkt` | 6 | `bind` | incomplete/stub | Import/define the target monad operators (`bind`, `unit`, `fail`, `mdelay`) before `ee`. |
-| `old-mk-cps/map-join-with-dan.rkt` | 101 | `bind` | historical-experimental | Re-enable intended `bind` definition or convert the bottom examples into comments if file is note-only. |
+| `archive/map-join-xform/map-join-xform-other-monad.rkt` | 6 | `bind` | incomplete/stub | Import/define the target monad operators (`bind`, `unit`, `fail`, `mdelay`) before `ee`. |
+| `archive/map-join-with-dan/map-join-with-dan.rkt` | 101 | `bind` | historical-experimental | Re-enable intended `bind` definition or convert the bottom examples into comments if file is note-only. |
 | `interp/run-interp.rkt` | 15 | `?k` | incomplete/stub | Replace placeholder continuation names (`?k`, `?k2`) with concrete parameters and complete `valof^-cps` contract. |
