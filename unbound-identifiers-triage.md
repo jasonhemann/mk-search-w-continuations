@@ -13,12 +13,17 @@ This triage is based on a repo-wide compile sweep using `raco make` over all `*.
 - Rationale: this is a pattern-binding correctness fix only, not an algorithmic change.
 - Post-fix note: the same file still contains a separate placeholder call at line 73 (`<n>`, `<exp>`, `<dk>`, `<sk>`, `<fk>`, `<k>`) that remains unresolved by design in this pass.
 
+- File: `new-derivation/examples-suite-2.rkt` (renamed from `new-derivation/stream-fix-mplus-bind-examples.rkt`)
+- Prior location: line 105 in the old filename
+- Identifier previously reported unbound: `kons`
+- Fix: quarantined non-runnable reduction scratch in a block comment so the suite file now compiles while retaining derivation notes.
+- Rationale: this preserves experimental reasoning text without treating scratch fragments as executable test code.
+
 ## Remaining unbound identifiers
 
 | file | line | identifier | classification | recommended next action |
 |---|---:|---|---|---|
 | `sk-fk-from-double-cps/deep-remove-first-1.rkt` | 95 | `sk` | historical-experimental | Treat as derivation scratch; either define/rename continuations consistently or move non-runnable fragment into comments. |
-| `new-derivation/stream-fix-mplus-bind-examples.rkt` | 105 | `kons` | requires intent | Decide whether the scratch reduction block is meant to execute; if yes, bind `kons/nill` in scope, otherwise comment/move the block. |
 | `new-derivation/shallow-monadic-interp-1.rkt` | 74 | `bind` | incomplete/stub | Complete the partially written expression with concrete continuation arguments and intended binder. |
 | `old-mk-cps/test-monads.rkt` | 4 | `writer-log` | requires intent | Align callsite with `monads-struct.rkt` API (`writer` struct accessors or `run-writer`) and pick one canonical writer test style. |
 | `old-mk-cps/a9-skmonads/map-join-xform-other-monad-4d.rkt` | 48 | `c` | historical-experimental | Inspect intended continuation parameter threading; add missing binder or rename to existing in-scope variable. |

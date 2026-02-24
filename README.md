@@ -10,6 +10,11 @@
 -  Then, read `./reading-danvy-again.org`
 -  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`, and simultaneously with these
 -  Read `./new-derivation/continuation-derivation-notes.org`
+-  Run/inspect `./new-derivation/sure-path-regressions.rkt` as the active derivation regression gate
+-  Use `./new-derivation/examples-suite-2.rkt` for suite-2 exploratory examples (with quarantined scratch reductions)
+-  Use `./new-derivation/continuation-case-matrix.txt` as a non-executable continuation reasoning matrix
+-  Read current structure status + reframed failed ideas in `./mk-search-structure-audit.md`
+-  Read current open vs resolved oracle findings in `./stage-relative-failure-oracle-report.md`
 -  Track compile-time unresolved names in `./unbound-identifiers-triage.md`
 
 ## A continuation-based implementation of the miniKanren search.
