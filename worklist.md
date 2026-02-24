@@ -19,6 +19,7 @@ Status values:
 5. `WL-005` Paper build reproducibility/toolchain
 6. `WL-006` Bibliography intake policy for non-DOI items
 7. `WL-007` Documentation synchronization pass
+8. `WL-008` Monad-law equivalence and proof-shape decision
 
 ## Tasks
 
@@ -89,3 +90,19 @@ Status values:
 - Definition of done:
   - No contradictory status claims across the listed docs.
   - README links and labels match current filenames and roles.
+
+### WL-008 Monad-law equivalence and proof-shape decision
+- Status: `blocked`
+- Scope:
+  - `new-derivation/proofs/monad-laws.rkt`
+  - `new-derivation/proofs/third-monad-law.rkt`
+  - `new-derivation/proofs/proof-obligations-checklist.md`
+- Goal: fix the theorem target and proof architecture before additional derivation work.
+- Blocking decisions:
+  - Select equality notion: extensional vs CBV observational (`run`/fuel).
+  - Specify assumed versus proved `mplus/mzero` laws.
+  - Choose one bind presentation (`bind` arity and vc story) or write a correspondence lemma.
+- Definition of done:
+  - Theorem statements are rewritten against the chosen equivalence.
+  - Dependency lemmas are listed explicitly with assumption/proof status.
+  - `third-monad-law.rkt` sketch is either completed or replaced by a structured obligation list.

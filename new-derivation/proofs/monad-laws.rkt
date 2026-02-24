@@ -1,5 +1,11 @@
 #lang racket
 
+;; Status (2026-02-24):
+;; - This file contains executable core definitions and non-executable proof sketches.
+;; - The sketches are not complete proofs yet.
+;; - Final law statements should be phrased using CBV observational equivalence
+;;   (e.g., run/fuel), not raw extensional function equality.
+
 #| 
 
 In this file I was going to try to use equational reasoning to show
@@ -52,6 +58,15 @@ Right identity: m >>= return ≡ m
 Associativity: (m >>= g) >>= h ≡ m >>= (\x -> g x >>= h)
 
 |# 
+
+#|
+Open decision points (blocking proof completion):
+1. Which equivalence relation is primary: extensional equality or CBV observational
+   equivalence under run/fuel?
+2. Which mplus/mzero laws are assumed versus proved (and under which fairness policy)?
+3. Should the final presentation use 1-arg bind, 2-arg vc bind, or a correspondence
+   theorem between the two formulations?
+|#
 
 
 (define (fix f)
@@ -264,10 +279,10 @@ m
 = reducing return
   (λ (dk sk fk)
     ((λ (a vc c2)
-       (sk a vc (mplus c2 c))
-       b
-       vc 
-       (mzero))))
+       (sk a vc (mplus c2 c)))
+     b
+     vc
+     (mzero)))
 = reducing the success continuation
 (λ (dk sk fk)
  (sk b vc (mplus (mzero) c)))
@@ -291,7 +306,7 @@ m
    fk))
 = after reducing m by application
 (λ (dk sk fk) 
-  fk)
+  (fk))
 = pretty trivially, then
 m
 
@@ -372,7 +387,7 @@ Left identity: return a vc >>= h ≡ h a vc
    fk))
 = eta reduction
 (mplus (h a vc) (bind (mzero) h))
-= assuming our (mzero) `bind` h = h law
+= assuming our (mzero) `bind` h = (mzero) law
 (mplus (h a vc) (mzero))
 = assuming our x `orelse` fail = x law
 (h a vc)

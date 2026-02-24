@@ -1,5 +1,16 @@
 #lang racket
 
+;; Status (2026-02-24):
+;; - This file is a handwritten associativity sketch.
+;; - It is intentionally non-executable; keep as derivation notes.
+;; - The previous version evaluated as code and failed with unbound identifiers.
+;;
+;; Open decision points:
+;; 1. Use CBV observational equivalence (run/fuel) as the theorem equality.
+;; 2. Resolve bind arity/story (1-arg versus 2-arg vc) before completing the proof.
+;; 3. Make explicit which mplus/mzero laws are assumptions versus derived lemmas.
+
+#|
 (bind m (lambda (x y) (bind (g x y) h)))
 = Unfolding the outer definition of bind
 ((fix2
@@ -269,3 +280,4 @@
       sk
       fk))
    fk))
+|#
