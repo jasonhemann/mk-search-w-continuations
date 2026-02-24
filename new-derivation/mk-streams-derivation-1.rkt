@@ -27,7 +27,7 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
   (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name ((map f) m))) 
+      ((promise? m) (delay/name ((map f) (force m))))
       ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
 
@@ -66,7 +66,7 @@ http://www.ccs.neu.edu/home/dherman/browse/projects/derivations/monad-equiv/mona
   (define ((bind m) f)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (bind (force m) f)))
+      ((promise? m) (delay/name ((bind (force m)) f)))
       ((cons? m) (mplus (f (car m)) ((bind (cdr m)) f)))))
 
   ;; mplus: Ma -> Ma -> Ma 

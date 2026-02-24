@@ -52,7 +52,7 @@ Not _entirely_ sure I'm happy with the walk-ans-es
   (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (join ((map f) (force m))))) 
+      ((promise? m) (delay/name ((map f) (force m))))
       ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
   (define (join mma)

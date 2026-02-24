@@ -17,7 +17,7 @@ This step was
   (define ((map f) m)
     (cond
       ((null? m) '())
-      ((promise? m) (delay/name (join ((map f) (force m)))))
+      ((promise? m) (delay/name ((map f) (force m))))
       ((cons? m) (cons (f (car m)) ((map f) (cdr m))))))
 
   (define (join mma)
@@ -129,7 +129,7 @@ This step was
                (dk (join mm^))))
             (λ (mb)
               (λ (fk)
-                ((mb sk) fk))))
+                (((mb dk) sk) fk))))
            fk)))))
 
   (define (return a)
@@ -159,7 +159,8 @@ This step was
                (dk ((bind m^) f))))
             (λ (b)
               (λ (fk)
-                (((f b)
+                ((((f b)
+                   dk)
                   sk)
                  fk))))
            fk)))))
