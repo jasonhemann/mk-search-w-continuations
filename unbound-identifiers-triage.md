@@ -32,4 +32,4 @@ This triage is based on a repo-wide compile sweep using `raco make` over all `*.
 | `old-mk-cps/two-k-test.rkt` | 8 | `a?` | requires intent | Choose/define intended discriminator predicate for answer-vs-failure payload. |
 | `old-mk-cps/map-join-xform-other-monad.rkt` | 6 | `bind` | incomplete/stub | Import/define the target monad operators (`bind`, `unit`, `fail`, `mdelay`) before `ee`. |
 | `old-mk-cps/map-join-with-dan.rkt` | 101 | `bind` | historical-experimental | Re-enable intended `bind` definition or convert the bottom examples into comments if file is note-only. |
-| `run-interp/run-interp.rkt` | 15 | `?k` | incomplete/stub | Replace placeholder continuation names (`?k`, `?k2`) with concrete parameters and complete `valof^-cps` contract. |
+| `interp/run-interp.rkt` | 15 | `?k` | incomplete/stub | Replace placeholder continuation names (`?k`, `?k2`) with concrete parameters and complete `valof^-cps` contract. |

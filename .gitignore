@@ -2,6 +2,7 @@
 *~
 \#*\#
 .\#*
+.DS_Store
 
 # Racket compiled artifacts
 compiled/
@@ -18,3 +19,4 @@ paper/*.fls
 paper/*.log
 paper/*.out
 paper/*.run.xml
+paper/*.pdf
