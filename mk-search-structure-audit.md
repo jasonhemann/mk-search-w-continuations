@@ -30,7 +30,7 @@ This audit excludes all PDF contents and excludes backup/editor/build artifacts.
 ### Active
 - `new-derivation/mk-streams-derivation.rkt`
 - `new-derivation/examples.rkt`
-- `new-derivation/sure-path-regressions.rkt`
+- `new-derivation/derivation-invariant-regressions.rkt`
 
 Rationale: these establish the strongest current baseline and include direct regression coverage for recently fixed monad-law paths.
 
@@ -89,7 +89,7 @@ Rationale: these are high-friction research trails with unresolved placeholders 
 ### Passing checks
 - `raco test new-derivation/examples.rkt`: passes (`21 tests passed`).
 - `racket new-derivation/examples-new.rkt`: passes (no failures printed).
-- `racket new-derivation/sure-path-regressions.rkt`: passes (`14 success(es), 0 failure(s)`).
+- `racket new-derivation/derivation-invariant-regressions.rkt`: passes (`14 success(es), 0 failure(s)`).
 - `raco make new-derivation/examples-suite-2.rkt`: passes (no unbound identifiers).
 
 ### Parity matrix (current high-signal scenarios)
@@ -146,7 +146,7 @@ Use these as “try/fail/explain” reminders for future passes.
 
 ### Still makes sense to work on
 - Keep `mk-streams-derivation.rkt` as semantic reference.
-- Continue regression-first workflow with `sure-path-regressions.rkt`.
+- Continue regression-first workflow with `derivation-invariant-regressions.rkt`.
 - Repair v4 sk/fk `run` to restore scoped parity.
 
 ### Needs repair before trust

@@ -5,6 +5,9 @@ As opposed to looking at it as an arbitrary tree shape, knowing we
 have a by-default left-to-right SLD behavior, then we can read those
 as two continuations.
 
+Recovered note from autosave (kept): descending through `conj` grows SK
+structure; descending through `disj` grows FK structure.
+
 
 (conj (conj ... ...) (conj ... ...))
 (conj (conj ... ...) (disj ... ...))
