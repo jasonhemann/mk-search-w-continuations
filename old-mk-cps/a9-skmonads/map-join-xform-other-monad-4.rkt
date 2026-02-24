@@ -36,7 +36,7 @@
 
 (define (apply-sk dk c k)
   (match dk
-    [`(loop-base-dk dk^ sk fk)         (apply-c c dk^ sk fk k)]
+    [`(loop-base-dk ,dk^ ,sk ,fk)      (apply-c c dk^ sk fk k)]
     [`(disj-dk ,c2 ,dk^)               (apply-k (delay-k dk^ k) (disj-c c c2))]
     [`(looper-iter-dk ,n ,exp ,sk ,fk) (looper n exp (recur-dk-k c sk fk k) sk fk) ]
     [`(bind-dk ,g ,dk^)                (apply-k (delay-k dk^ k) (bind-c c g))]

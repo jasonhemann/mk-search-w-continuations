@@ -10,6 +10,7 @@
 -  Then, read `./reading-danvy-again.org`
 -  Then, follow `./new-derivation/mk-streams-derivation-1.rkt` all the way through `-4`, and simultaneously with these
 -  Read `./new-derivation/continuation-derivation-notes.org`
+-  Track compile-time unresolved names in `./unbound-identifiers-triage.md`
 
 ## A continuation-based implementation of the miniKanren search.
 
@@ -84,4 +85,3 @@ We anticipate semantics directed compilation by partial evaluation.
 # Directory Structure 
 
 I structured the contents of this directory as follows:
-
