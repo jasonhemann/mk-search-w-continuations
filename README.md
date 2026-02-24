@@ -17,6 +17,7 @@
 -  Read current open vs resolved oracle findings in `./stage-relative-failure-oracle-report.md`
 -  Track compile-time unresolved names in `./unbound-identifiers-triage.md`
 -  Track imported-file provenance and currently "sus" staged files in `./imported-files-and-sus-worklist.md`
+-  Pull next independently-executable tasks from `./worklist.md`
 
 ## A continuation-based implementation of the miniKanren search.
 
