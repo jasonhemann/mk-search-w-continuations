@@ -47,6 +47,10 @@ Status values:
   - `old-mk-cps/`
   - `archive/`
 - Goal: decide whether `old-mk-cps` remains a top-level historical subtree or is folded under `archive/`, and classify each failing file as `salvage`, `archive-only`, or `generated-detritus`.
+- Baseline snapshot (2026-02-25):
+  - `old-mk-cps`: `33` `*.rkt` files, `25` compile, `8` fail.
+  - `archive`: `30` `*.rkt` files, `23` compile, `7` fail.
+  - Combined failure shape is mostly placeholder/unbound identifiers and duplicate definitions, with a small number of syntax/non-module artifacts.
 - Definition of done:
   - Directory policy is explicitly documented in `README.md` and `archive/README.md`.
   - Each current `raco make` failure in `old-mk-cps/` and `archive/` has a chosen disposition.
