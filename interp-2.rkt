@@ -2,6 +2,13 @@
 (require rackunit)
 (require "monads.rkt")
 
+;; Status (2026-02-25):
+;; - historical-foundational branch-point artifact.
+;; - monadicization attempt of the Figure-5 Danvy interpreter.
+;; - not runnable in current repo state: local `monads.rkt` dependency
+;;   (expected to provide at least `return` and `doₖ`) is missing.
+;; - retained as provenance, not an active derivation regression gate.
+
 ;; Attempted monadic implementation of the Fig. 5 continuation
 ;; semantics from Danvy et al's "Unified Approach to Goal-Oriented
 ;; Languages"

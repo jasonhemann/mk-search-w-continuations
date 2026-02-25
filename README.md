@@ -21,6 +21,13 @@
 -  Track imported-file provenance and currently "sus" staged files in `./imported-files-and-sus-worklist.md`
 -  Pull next independently-executable tasks from `./worklist.md`
 
+## Seminal Danvy Interpreter Branch
+
+- `interp-1.rkt` and `interp-2.rkt` are historical-foundational branch-point artifacts for this repo.
+- They capture a transition from a direct Figure-5 continuation interpreter (`interp-1.rkt`) to a monadicized variant with swappable monad operations (`interp-2.rkt`).
+- These files are preserved as provenance for how the miniKanren-monad line of work started, not as active derivation regression gates.
+- `interp-2.rkt` is currently incomplete in this repo state because its original local dependency (`monads.rkt`) is not present.
+
 ## A continuation-based implementation of the miniKanren search.
 
 This work is directly preceded in parts by Danvy et al.'s "A Unifying

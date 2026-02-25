@@ -1,6 +1,11 @@
 #lang racket
 (require rackunit)
 
+;; Status (2026-02-25):
+;; - historical-foundational branch-point artifact.
+;; - direct Figure-5 continuation interpreter line from Danvy et al.
+;; - runnable, but not part of the active derivation regression gate.
+
 ;; An implementation of the continuation semantics from Fig. 5 of
 ;; Danvy et al "Unified Approach to Goal-Oriented Languages"
 

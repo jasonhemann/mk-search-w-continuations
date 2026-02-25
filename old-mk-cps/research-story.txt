@@ -11,6 +11,14 @@ purpose-named archive directories:
 - `a9-skmonads2/micro-ks*` ->
   `/Users/jhemann/Documents/mk-search-w-continuations/archive/micro-language-3k-derivation/`
 
+Branch-point note (2026-02-25): the root files `interp-1.rkt` and
+`interp-2.rkt` are seminal transition artifacts from the Danvy Figure
+5 interpreter line. `interp-1.rkt` is a direct continuation
+interpreter, while `interp-2.rkt` is a monadicization attempt with
+swappable monad operations. They are retained as historical-foundational
+provenance for the later miniKanren-monad derivation work, not as
+active regression gates.
+
 This research began in the shadow of some earlier but failed work at
 attempting to implement a microKanren in Idris. I'd wanted to prove a
 whole bunch of the properties needed for showing termination of the
@@ -147,4 +155,3 @@ to try and derive my way in the `a9-skmonads2/micro-ks-X` files to the
 three continuation model via CPSing the two-k version somehow into the
 3 k version that I want. I wasn't exactly sure how to do it and how to
 get there, and that's about where I got stopped.
-
