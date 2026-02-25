@@ -20,3 +20,19 @@ paper/*.log
 paper/*.out
 paper/*.run.xml
 paper/*.pdf
+
+# TeX/LaTeX build detritus (global)
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.toc
+*.synctex.gz
+
+# biber --tool output
+*_bibertool.bib

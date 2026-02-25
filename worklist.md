@@ -1,6 +1,6 @@
 # Project Worklist
 
-Last updated: 2026-02-24
+Last updated: 2026-02-25
 
 This is the pull queue for independently-executable tasks.
 
@@ -10,16 +10,24 @@ Status values:
 - `blocked`: waiting on a prior decision
 - `done`: finished and merged
 
+## Recent Completions (Already Merged)
+
+- Archive workstreams were renamed to purpose-first names and documented in per-subdir READMEs.
+- Historical timeline text was consolidated into archive docs; redundant redirect file removed.
+- `interp-1.rkt` / `interp-2.rkt` were documented as seminal branch-point artifacts (historical-foundational, non-gating).
+- Stale compile-status claims in supporting docs were corrected for files that now compile.
+
 ## Pull Order (Suggested)
 
 1. `WL-001` Sus backlog policy decisions (non-code artifacts)
-2. `WL-002` Code-path bug-fix shortlist and fix specs
-3. `WL-003` Unbound-identifier backlog closure
-4. `WL-004` Active regression-gate boundary
-5. `WL-005` Paper build reproducibility/toolchain
-6. `WL-006` Bibliography intake policy for non-DOI items
-7. `WL-007` Documentation synchronization pass
-8. `WL-008` Monad-law equivalence and proof-shape decision
+2. `WL-009` Old-code placement decision (`old-mk-cps` vs `archive`)
+3. `WL-002` Code-path bug-fix shortlist and fix specs
+4. `WL-003` Unbound-identifier backlog closure
+5. `WL-004` Active regression-gate boundary
+6. `WL-005` Paper build reproducibility/toolchain
+7. `WL-006` Bibliography intake policy for non-DOI items
+8. `WL-007` Documentation synchronization pass
+9. `WL-008` Monad-law equivalence and proof-shape decision
 
 ## Tasks
 
@@ -32,6 +40,17 @@ Status values:
 - Definition of done:
   - Every `sus` row has explicit disposition (`promote`, `archive`, `keep-scratch`).
   - Each row has one next action and owner rationale.
+
+### WL-009 Old-code placement decision (`old-mk-cps` vs `archive`)
+- Status: `todo`
+- Scope:
+  - `old-mk-cps/`
+  - `archive/`
+- Goal: decide whether `old-mk-cps` remains a top-level historical subtree or is folded under `archive/`, and classify each failing file as `salvage`, `archive-only`, or `generated-detritus`.
+- Definition of done:
+  - Directory policy is explicitly documented in `README.md` and `archive/README.md`.
+  - Each current `raco make` failure in `old-mk-cps/` and `archive/` has a chosen disposition.
+  - Generated artifacts (`compiled/`, TeX aux files, `.DS_Store`) have an explicit keep/remove rule.
 
 ### WL-002 Code-path bug-fix shortlist and fix specs
 - Status: `todo`
