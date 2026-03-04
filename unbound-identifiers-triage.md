@@ -1,35 +1,36 @@
-# Unbound Identifier Triage
+# Unbound Identifier and Compile-Failure Triage
 
 ## Scope and method
 
-This triage is based on a repo-wide compile sweep using `raco make` over all `*.rkt` files (excluding editor backup patterns).
+This triage is synchronized to a repo-wide compile sweep (`raco make` over all `*.rkt`, excluding editor backup patterns) run on **2026-03-04**.
 
-## Fixed in this change
+## Current failing files (2026-03-04)
 
-- File: `archive/defunctionalized-dispatch-experiments/map-join-xform-other-monad-4.rkt`
-- Location: line 39
-- Identifier previously reported unbound: `dk^`
-- Fix: corrected `match` quasiquote binder pattern from `` `(loop-base-dk dk^ sk fk) `` to `` `(loop-base-dk ,dk^ ,sk ,fk) `` so symbols are bound rather than matched literally.
-- Rationale: this is a pattern-binding correctness fix only, not an algorithmic change.
-- Post-fix note: the same file still contains a separate placeholder call at line 73 (`<n>`, `<exp>`, `<dk>`, `<sk>`, `<fk>`, `<k>`) that remains unresolved by design in this pass.
+The current sweep reports `8` failing files. This table is the active backlog for `WL-003`.
 
-- File: `new-derivation/examples-suite-2.rkt` (renamed from `new-derivation/stream-fix-mplus-bind-examples.rkt`)
-- Prior location: line 105 in the old filename
-- Identifier previously reported unbound: `kons`
-- Fix: quarantined non-runnable reduction scratch in a block comment so the suite file now compiles while retaining derivation notes.
-- Rationale: this preserves experimental reasoning text without treating scratch fragments as executable test code.
+| file | primary failure | classification | recommended next action |
+|---|---|---|---|
+| `sk-fk-from-double-cps/deep-remove-first-1.rkt` | `sk` unbound (line 95) | historical-experimental | Decide `salvage-now` vs `archive-only`; if salvaged, normalize continuation names and bind all continuation arguments explicitly. |
+| `new-derivation/experiments/nested-runs.rkt` | read-syntax missing `)` (line 29) | trivial-syntax + requires-intent | Apply minimal parenthesis fix, then either add required dependencies for `run`/`==`/`typo` or mark the file as note-only exploratory context. |
+| `new-derivation/shallow-monadic-interp-1.rkt` | `bind` unbound (line 74) | incomplete/stub | Complete the partially written expression path and bind to the intended monad interface for this file’s stage. |
+| `old-mk-cps/three-k-test.rkt` | `c` unbound (line 48) | salvageable-derivation | Convert to explicit stage modules with runnable probes; remove accidental cross-stage free references. |
+| `old-mk-cps/mk-monad-map-join.rkt` | `ma?` unbound (line 67) | salvageable-derivation | Resolve representation discriminator (`ma?`) by defining it or replacing with the intended stream/computation predicate, then validate probes. |
+| `w-michael.rkt` | identifier already defined (`$append`) | salvageable-derivation | Split derivation stages into `module stepN racket` blocks and keep each stage internally consistent with local probes. |
+| `interp/run-interp.rkt` | `?k` unbound (line 15) | incomplete/stub | Replace placeholder continuation names (`?k`, `?k2`) with concrete contract-level parameters, or explicitly classify as historical skeleton. |
+| `interp-2.rkt` | cannot open module file (`monads.rkt`) | external-dependency | Either recover/add a compatible local `monads.rkt` shim, or keep as historical-foundational non-runnable artifact with explicit note. |
 
-## Remaining unbound identifiers
+## Resolved/removed from active failure set
 
-| file | line | identifier | classification | recommended next action |
-|---|---:|---|---|---|
-| `sk-fk-from-double-cps/deep-remove-first-1.rkt` | 95 | `sk` | historical-experimental | Treat as derivation scratch; either define/rename continuations consistently or move non-runnable fragment into comments. |
-| `new-derivation/shallow-monadic-interp-1.rkt` | 74 | `bind` | incomplete/stub | Complete the partially written expression with concrete continuation arguments and intended binder. |
-| `old-mk-cps/test-monads.rkt` | 4 | `writer-log` | requires intent | Align callsite with `monads-struct.rkt` API (`writer` struct accessors or `run-writer`) and pick one canonical writer test style. |
-| `archive/defunctionalized-dispatch-experiments/map-join-xform-other-monad-4d.rkt` | 48 | `c` | historical-experimental | Inspect intended continuation parameter threading; add missing binder or rename to existing in-scope variable. |
-| `archive/defunctionalized-dispatch-experiments/map-join-xform-other-monad-4.rkt` | 73 | `<n>` | incomplete/stub | Replace/remove placeholder top-level probe call (`<n>`, `<exp>`, `<dk>`, `<sk>`, `<fk>`, `<k>`) once intended invocation is specified. |
-| `archive/micro-language-3k-derivation/micro-ks-3.rkt` | 49 | `sk` | incomplete/stub | Replace free `sk/fk/dk` with explicit parameters in `init-dk` or lexical bindings. |
-| `old-mk-cps/two-k-test.rkt` | 8 | `a?` | requires intent | Choose/define intended discriminator predicate for answer-vs-failure payload. |
-| `archive/map-join-transformations/map-join-xform-other-monad.rkt` | 6 | `bind` | incomplete/stub | Import/define the target monad operators (`bind`, `unit`, `fail`, `mdelay`) before `ee`. |
-| `archive/three-continuation-derivation/map-join-with-dan.rkt` | 101 | `bind` | historical-experimental | Re-enable intended `bind` definition or convert the bottom examples into comments if file is note-only. |
-| `interp/run-interp.rkt` | 15 | `?k` | incomplete/stub | Replace placeholder continuation names (`?k`, `?k2`) with concrete parameters and complete `valof^-cps` contract. |
+These were previously listed as unresolved in this doc and are no longer in the current failure set:
+
+- `old-mk-cps/test-monads.rkt` (`writer-log` unbound) — now aligned to current API.
+- `archive/defunctionalized-dispatch-experiments/map-join-xform-other-monad-4d.rkt` (`c` unbound) — no longer reported by current sweep.
+- `archive/defunctionalized-dispatch-experiments/map-join-xform-other-monad-4.rkt` placeholder top-level `<...>` invocation — no longer reported by current sweep.
+- `archive/micro-language-3k-derivation/micro-ks-3.rkt` (`sk` unbound) — no longer reported by current sweep.
+- `archive/map-join-transformations/map-join-xform-other-monad.rkt` (`bind` unbound) — no longer reported by current sweep.
+- `archive/three-continuation-derivation/map-join-with-dan.rkt` (`bind` unbound) — no longer reported by current sweep.
+
+## Notes
+
+- This document tracks compile failures, not semantic correctness.
+- For derivation files, preferred remediation is **explicit staged modules with runnable probes**, not broad comment-out suppression.
