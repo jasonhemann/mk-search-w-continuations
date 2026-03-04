@@ -20,6 +20,7 @@ paper/*.log
 paper/*.out
 paper/*.run.xml
 paper/*.pdf
+paper/*.data.minted
 
 # TeX/LaTeX build detritus (global)
 *.aux
