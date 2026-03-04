@@ -97,7 +97,8 @@
 \usepackage{minted} %% My brand new baby for highlighting source code
 %% also adds \begin{framed} environment
 \usepackage{mathpartir} %% Didier Remy's typesetting for proofs.
-\usepackage{semantic}
+% semantic.sty conflicts with current XeTeX/unicode-math and is unused in this file.
+% \usepackage{semantic}
 \usepackage[strict,autostyle]{csquotes} %% enquote &c that doesn't interfere w/cdlatex usage http://ftp.lyx.org/pub/tex-archive/macros/latex/contrib/csquotes/csquotes.pdf
 \usepackage[xspace]{ellipsis} %% http://tex.stackexchange.com/questions/73467/what-is-best-method-to-insert-an-ellipsis-in-a-xetex-document#73469
 \usepackage{pseudocode}
@@ -233,7 +234,7 @@ constructors with its continuation-based variant. These subtleties
 compound when we add \enquote{interleaving}.
 
 \begin{listing}
-\begin{minted}[autogobble,stripall,linenos]{ml}
+\begin{minted}[autogobble,stripall,linenos]{ocaml}
 datatype 'a list   = Nil | Cons of 'a * 'a list
 datatype 'a stream = End | More of 'a * (1 -> 'a stream)
 \end{minted}
@@ -241,11 +242,11 @@ datatype 'a stream = End | More of 'a * (1 -> 'a stream)
 \label{mnt:eager-lazy-datatypes}
 \end{listing}
 
-The \mintinline{ml}|stream| datatype we define in
-\cref{mnt:eager-lazy-datatypes}, unlike the \mintinline{ml}|list|
+The \mintinline{ocaml}|stream| datatype we define in
+\cref{mnt:eager-lazy-datatypes}, unlike the \mintinline{ocaml}|list|
 datatype, demands a thunk as the second argument to the
-\mintinline{ml}|More| constructor, to delay evaluation. We could have
-instead appealed to lazy constructors (e.g. \mintinline{ml}|lazy|) or
+\mintinline{ocaml}|More| constructor, to delay evaluation. We could have
+instead appealed to lazy constructors (e.g. \mintinline{ocaml}|lazy|) or
 retreated to a lazy host language. Those alternative choices, however,
 bury the relationship we want to explore further.
 
@@ -265,7 +266,7 @@ an even kind of stream. We reproduce this definition in
   non-strict evaluation but also memoization.}.
   
 \begin{listing}
-\begin{minted}[autogobble,stripall,linenos]{ml}
+\begin{minted}[autogobble,stripall,linenos]{ocaml}
 datatype 'a stream_ = End_ | More_ of 'a * 'a stream
 withtype 'a stream  = (1 -> 'a stream_)
 \end{minted}
@@ -290,7 +291,7 @@ use the delays as markers for the interleave positions when combining
 two streams.
 
 \begin{listing}
-\begin{minted}[autogobble,stripall,linenos]{ml}
+\begin{minted}[autogobble,stripall,linenos]{ocaml}
 datatype 'a stream__ = Nil__ | Cons__ of 'a * 'a stream__ | (1 -> 'a stream__)
 \end{minted}
 \caption{Even more odd streams}
@@ -757,6 +758,16 @@ There are a variety of other works that describe or relate to using CPS with dou
 % \begin{acks}
 %   We thank you all. 
 % \end{acks}
+
+% Include currently uncited bibliography entries for bibliography/build validation.
+\nocite{hagino1989codatatypes,spivey2000combinators,deschreye1999logic,seres1999algebra,byrd2017unifiedapproach,frigo1994implementing,robinson1965machine,kiselyov2005backtracking,rozplokhas2019certified}
+\nocite{wand2004relating,hinze2000deriving,danvy2002unifying,danvy2007barron,hughes1986novel,bove2005modelling,danvy-hatcliff-cps-after-strictness,hatcliff-danvy-generic-cps,bieniusa-thiemann-cps-transform-monad,wadler1998add}
+\nocite{danvy-functional-correspondence-evaluators-machines,danvy-back-to-direct-style,danvy-three-steps-cps,danvy-evaluation-contexts-continuations-rest,lawall-danvy-continuation-based-partial-eval,pottier-revisiting-cps-transformation,danvy-journey-interpreters-compilers-vm,desouter2016towards-flexible-goal-oriented}
+\nocite{hillerstrom-lindley-atkey-cps-effect-handlers,biernacki-danvy-millikin-dynamic-cps,wand-continuation-based-program-transformation-strategies,pirog2016eilenberg-moore-monoids,schrijvers2012search-combinators,kidney2021algebras-weighted-search,pirog2017backtracking-cut-left-zero,rivas2018unified-monadic-applicative-nondeterminism}
+\nocite{PlotkinPower2002,PlotkinPower2003,VandenbrouckeSchrijvers2023,Wadler1989,dix1996semantics,fordan1999projection,jaffar1992output}
+\nocite{jaffar1993projecting,haynes1987logiccontinuations,kowalski1998executing,sato1990completed,vandevel2010theories,vanhentenryck1995backtracking,wand1983semantic,vasak1986survey-control-facilities-logic-programming}
+\nocite{sabry-felleisen1993reasoning-cps,dybvig-peyton-jones-sabry2007monadic-delimited-continuations}
+\nocite{meseguer1997interleaved,flanagan1993essence,hinze1996efficient,hinze1999deriving,hinze2001prolog,brassel2010transforming,michel2004decomposition,schrijvers2009monadic}
 
 \printbibliography{}
 
